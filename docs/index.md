@@ -2,7 +2,7 @@
 # Supervised Learning : Exploring Penalized Models for Predicting Numeric Responses
 
 ***
-### John Pauline Pineda <br> <br> *November 15, 2023*
+### John Pauline Pineda <br> <br> *November 17, 2023*
 ***
 
 * [**1. Table of Contents**](#TOC)
@@ -7970,6 +7970,379 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
 ## 1.7. Consolidated Findings <a class="anchor" id="1.7"></a>
+
+
+```python
+##################################
+# Consolidating all the
+# model performance measures
+##################################
+performance_comparison = pd.concat([linear_performance_train, 
+                                    linear_performance_test,
+                                    polynomial_performance_train, 
+                                    polynomial_performance_test,
+                                    ridge_performance_train, 
+                                    ridge_performance_test,
+                                    lasso_performance_train, 
+                                    lasso_performance_test,
+                                    elasticnet_performance_train, 
+                                    elasticnet_performance_test], 
+                                   ignore_index=True)
+print('Consolidated Model Performance on Train and Test Data: ')
+display(performance_comparison)
+```
+
+    Consolidated Model Performance on Train and Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>R2</td>
+      <td>0.633225</td>
+      <td>linear_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>MSE</td>
+      <td>0.354963</td>
+      <td>linear_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>MAE</td>
+      <td>0.460899</td>
+      <td>linear_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>R2</td>
+      <td>0.644619</td>
+      <td>linear_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>MSE</td>
+      <td>0.371621</td>
+      <td>linear_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>MAE</td>
+      <td>0.477317</td>
+      <td>linear_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>R2</td>
+      <td>0.790822</td>
+      <td>polynomial_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>MSE</td>
+      <td>0.202441</td>
+      <td>polynomial_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>MAE</td>
+      <td>0.350251</td>
+      <td>polynomial_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>R2</td>
+      <td>0.632381</td>
+      <td>polynomial_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>MSE</td>
+      <td>0.384419</td>
+      <td>polynomial_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>MAE</td>
+      <td>0.486662</td>
+      <td>polynomial_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>R2</td>
+      <td>0.621954</td>
+      <td>ridge_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>MSE</td>
+      <td>0.365871</td>
+      <td>ridge_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>MAE</td>
+      <td>0.467997</td>
+      <td>ridge_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>R2</td>
+      <td>0.635183</td>
+      <td>ridge_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>MSE</td>
+      <td>0.381488</td>
+      <td>ridge_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>MAE</td>
+      <td>0.483822</td>
+      <td>ridge_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>R2</td>
+      <td>0.629495</td>
+      <td>lasso_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>MSE</td>
+      <td>0.358573</td>
+      <td>lasso_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>MAE</td>
+      <td>0.460833</td>
+      <td>lasso_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>R2</td>
+      <td>0.640452</td>
+      <td>lasso_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>MSE</td>
+      <td>0.375978</td>
+      <td>lasso_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>MAE</td>
+      <td>0.480495</td>
+      <td>lasso_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>R2</td>
+      <td>0.629847</td>
+      <td>elasticnet_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>MSE</td>
+      <td>0.358232</td>
+      <td>elasticnet_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>MAE</td>
+      <td>0.460799</td>
+      <td>elasticnet_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>R2</td>
+      <td>0.640929</td>
+      <td>elasticnet_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>MSE</td>
+      <td>0.375480</td>
+      <td>elasticnet_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>MAE</td>
+      <td>0.479981</td>
+      <td>elasticnet_regression</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Consolidating all the R2
+# model performance measures
+##################################
+performance_comparison_R2 = performance_comparison[performance_comparison['metric_name']=='R2']
+performance_comparison_R2_train = performance_comparison_R2[performance_comparison_R2['set']=='train'].loc[:,"metric_value"]
+performance_comparison_R2_test = performance_comparison_R2[performance_comparison_R2['set']=='test'].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Plotting all the R2
+# model performance measures
+# between train and test sets
+##################################
+performance_comparison_R2_plot = pd.DataFrame({'train': performance_comparison_R2_train.values,
+                                              'test': performance_comparison_R2_test.values},
+                                              index=performance_comparison_R2['model'].unique())
+performance_comparison_R2_plot = performance_comparison_R2_plot.plot.barh(figsize=(10, 6))
+performance_comparison_R2_plot.set_xlim(0.00,1.00)
+performance_comparison_R2_plot.set_title("Model Comparison by R-Squared Performance")
+performance_comparison_R2_plot.set_xlabel("R-Squared Performance")
+performance_comparison_R2_plot.set_ylabel("Regression Model")
+for container in performance_comparison_R2_plot.containers:
+    performance_comparison_R2_plot.bar_label(container)
+```
+
+
+    
+![png](output_213_0.png)
+    
+
+
+
+```python
+##################################
+# Consolidating all the MSE
+# model performance measures
+##################################
+performance_comparison_MSE = performance_comparison[performance_comparison['metric_name']=='MSE']
+performance_comparison_MSE_train = performance_comparison_MSE[performance_comparison_MSE['set']=='train'].loc[:,"metric_value"]
+performance_comparison_MSE_test = performance_comparison_MSE[performance_comparison_MSE['set']=='test'].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Plotting all the MSE
+# model performance measures
+# between train and test sets
+##################################
+performance_comparison_MSE_plot = pd.DataFrame({'train': performance_comparison_MSE_train.values,
+                                                'test': performance_comparison_MSE_test.values},
+                                               index=performance_comparison_MSE['model'].unique())
+performance_comparison_MSE_plot = performance_comparison_MSE_plot.plot.barh(figsize=(10, 6))
+performance_comparison_MSE_plot.set_xlim(0.00,1.00)
+performance_comparison_MSE_plot.set_title("Model Comparison by Mean Squared Error Performance")
+performance_comparison_MSE_plot.set_xlabel("Mean Squared Error Performance")
+performance_comparison_MSE_plot.set_ylabel("Regression Model")
+for container in performance_comparison_MSE_plot.containers:
+    performance_comparison_MSE_plot.bar_label(container)
+```
+
+
+    
+![png](output_215_0.png)
+    
+
+
+
+```python
+##################################
+# Consolidating all the MAE
+# model performance measures
+##################################
+performance_comparison_MAE = performance_comparison[performance_comparison['metric_name']=='MAE']
+performance_comparison_MAE_train = performance_comparison_MAE[performance_comparison_MAE['set']=='train'].loc[:,"metric_value"]
+performance_comparison_MAE_test = performance_comparison_MAE[performance_comparison_MAE['set']=='test'].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Plotting all the MAE
+# model performance measures
+# between train and test sets
+##################################
+performance_comparison_MAE_plot = pd.DataFrame({'train': performance_comparison_MAE_train.values,
+                                                'test': performance_comparison_MAE_test.values},
+                                               index=performance_comparison_MAE['model'].unique())
+performance_comparison_MAE_plot = performance_comparison_MAE_plot.plot.barh(figsize=(10, 6))
+performance_comparison_MAE_plot.set_xlim(0.00,1.00)
+performance_comparison_MAE_plot.set_title("Model Comparison by Mean Absolute Error Performance")
+performance_comparison_MAE_plot.set_xlabel("Mean Absolute Error Performance")
+performance_comparison_MAE_plot.set_ylabel("Regression Model")
+for container in performance_comparison_MAE_plot.containers:
+    performance_comparison_MAE_plot.bar_label(container)
+```
+
+
+    
+![png](output_217_0.png)
+    
+
 
 # 2. Summary <a class="anchor" id="Summary"></a>
 
