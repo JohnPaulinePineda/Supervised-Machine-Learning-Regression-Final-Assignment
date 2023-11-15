@@ -28,7 +28,7 @@
         * [1.6.4 Ridge Regression](#1.6.4)
         * [1.6.5 Least Absolute Shrinkage and Selection Operator Regression](#1.6.5)
         * [1.6.6 Elastic Net Regression](#1.6.6)
-     * [1.7 Consolidated Findings](#1.7)   
+    * [1.7 Consolidated Findings](#1.7)   
 * [**2. Summary**](#Summary)   
 * [**3. References**](#References)
 
@@ -36,13 +36,9 @@
 
 # 1. Table of Contents <a class="anchor" id="TOC"></a>
 
-This project explores the various methods in assessing **Data Quality**, implementing **Data Preprocessing** and conducting **Data Exploration** for prediction problems with numeric responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. A non-exhaustive list of methods to detect missing data, extreme outlying points, near-zero variance, multicollinearity, linear dependencies and skewed distributions were evaluated. Remedial procedures on addressing data quality issues including missing data imputation, centering and scaling transformation, shape transformation and outlier treatment were similarly considered, as applicable. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document.
+This project implements different penalized regression modelling procedures for numeric responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. Models applied in the analysis to predict numeric responses included the **Linear Regression**, **Polynomial Regression**, **Ridge Regression**, **Least Absolute Shrinkage and Selection Operator Regression** and **Elastic Net Regression** algorithms. The resulting predictions derived from the candidate models were evaluated in terms of their model fit using the r-squared, mean squared error (MSE) and mean absolute error (MAE) metrics. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document.
 
-[Data quality assessment](http://appliedpredictivemodeling.com/) involves profiling and assessing the data to understand its suitability for machine learning tasks. The quality of training data has a huge impact on the efficiency, accuracy and complexity of machine learning tasks. Data remains susceptible to errors or irregularities that may be introduced during collection, aggregation or annotation stage. Issues such as incorrect labels, synonymous categories in a categorical variable or heterogeneity in columns, among others, which might go undetected by standard pre-processing modules in these frameworks can lead to sub-optimal model performance, inaccurate analysis and unreliable decisions.
-
-[Data preprocessing](http://appliedpredictivemodeling.com/) involves changing the raw feature vectors into a representation that is more suitable for the downstream modelling and estimation processes, including data cleaning, integration, reduction and transformation. Data cleaning aims to identify and correct errors in the dataset that may negatively impact a predictive model such as removing outliers, replacing missing values, smoothing noisy data, and correcting inconsistent data. Data integration addresses potential issues with redundant and inconsistent data obtained from multiple sources through approaches such as detection of tuple duplication and data conflict. The purpose of data reduction is to have a condensed representation of the data set that is smaller in volume, while maintaining the integrity of the original data set. Data transformation converts the data into the most appropriate form for data modeling.
-
-[Data exploration](http://appliedpredictivemodeling.com/) involves analyzing and investigating data sets to summarize their main characteristics, often employing data visualization methods. It helps determine how best to manipulate data sources to discover patterns, spot anomalies, test a hypothesis, or check assumptions. This process is primarily used to see what data can reveal beyond the formal modeling or hypothesis testing task and provides a better understanding of data set variables and the relationships between them.
+[Penalized regression](https://link.springer.com/book/10.1007/978-1-4614-6849-3?page=1) is a form of variable selection method aimed at reducing model complexity by seeking a smaller subset of informative variables. This process keeps all the predictor variables in the model but constrains (regularizes) the regression coefficients by shrinking them toward zero, in addition to setting some coefficients exactly equal to zero, and is directly built as extensions of standard regression coefficient estimation by incorporating a penalty in the loss function. The algorithms applied in this study attempt to evaluate various penalties for over-confidence in the parameter estimates and accept a slightly worse fit in order to have a more parsimonious model.
 
 ## 1.1. Data Background <a class="anchor" id="1.1"></a>
 
@@ -147,6 +143,15 @@ from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error
 from sklearn.model_selection import train_test_split, KFold, GridSearchCV, RepeatedKFold, LeaveOneOut
 from sklearn.preprocessing import PolynomialFeatures 
 from sklearn.pipeline import Pipeline
+```
+
+
+```python
+##################################
+# Setting Global Options
+##################################
+np.set_printoptions(suppress=True, precision=4)
+pd.options.display.float_format = '{:.4f}'.format
 ```
 
 
@@ -267,122 +272,122 @@ cancer_rate.head()
     <tr>
       <th>0</th>
       <td>Australia</td>
-      <td>452.4</td>
-      <td>98380.63601</td>
-      <td>86.241</td>
-      <td>2368.0</td>
+      <td>452.4000</td>
+      <td>98380.6360</td>
+      <td>86.2410</td>
+      <td>2368.0000</td>
       <td>NaN</td>
-      <td>1.235701</td>
-      <td>83.200000</td>
-      <td>7.2</td>
-      <td>4.941054</td>
+      <td>1.2357</td>
+      <td>83.2000</td>
+      <td>7.2000</td>
+      <td>4.9411</td>
       <td>...</td>
-      <td>13.637841</td>
-      <td>131484.763200</td>
-      <td>17.421315</td>
-      <td>14.772658</td>
-      <td>24.893584</td>
-      <td>3.335312</td>
-      <td>110.139221</td>
-      <td>51722.06900</td>
+      <td>13.6378</td>
+      <td>131484.7632</td>
+      <td>17.4213</td>
+      <td>14.7727</td>
+      <td>24.8936</td>
+      <td>3.3353</td>
+      <td>110.1392</td>
+      <td>51722.0690</td>
       <td>VH</td>
-      <td>60.1</td>
+      <td>60.1000</td>
     </tr>
     <tr>
       <th>1</th>
       <td>New Zealand</td>
-      <td>422.9</td>
-      <td>77541.76438</td>
-      <td>86.699</td>
-      <td>348.0</td>
+      <td>422.9000</td>
+      <td>77541.7644</td>
+      <td>86.6990</td>
+      <td>348.0000</td>
       <td>NaN</td>
-      <td>2.204789</td>
-      <td>82.256098</td>
-      <td>7.2</td>
-      <td>4.354730</td>
+      <td>2.2048</td>
+      <td>82.2561</td>
+      <td>7.2000</td>
+      <td>4.3547</td>
       <td>...</td>
-      <td>80.081439</td>
-      <td>32241.937000</td>
-      <td>37.570126</td>
-      <td>6.160799</td>
+      <td>80.0814</td>
+      <td>32241.9370</td>
+      <td>37.5701</td>
+      <td>6.1608</td>
       <td>NaN</td>
-      <td>19.331586</td>
-      <td>75.734833</td>
-      <td>41760.59478</td>
+      <td>19.3316</td>
+      <td>75.7348</td>
+      <td>41760.5948</td>
       <td>VH</td>
-      <td>56.7</td>
+      <td>56.7000</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Ireland</td>
-      <td>372.8</td>
-      <td>198405.87500</td>
-      <td>63.653</td>
-      <td>75.0</td>
-      <td>1.23244</td>
-      <td>1.029111</td>
-      <td>82.556098</td>
-      <td>5.3</td>
-      <td>5.684596</td>
+      <td>372.8000</td>
+      <td>198405.8750</td>
+      <td>63.6530</td>
+      <td>75.0000</td>
+      <td>1.2324</td>
+      <td>1.0291</td>
+      <td>82.5561</td>
+      <td>5.3000</td>
+      <td>5.6846</td>
       <td>...</td>
-      <td>27.965408</td>
-      <td>15252.824630</td>
-      <td>11.351720</td>
-      <td>6.768228</td>
-      <td>0.274092</td>
-      <td>72.367281</td>
-      <td>74.680313</td>
-      <td>85420.19086</td>
+      <td>27.9654</td>
+      <td>15252.8246</td>
+      <td>11.3517</td>
+      <td>6.7682</td>
+      <td>0.2741</td>
+      <td>72.3673</td>
+      <td>74.6803</td>
+      <td>85420.1909</td>
       <td>VH</td>
-      <td>57.4</td>
+      <td>57.4000</td>
     </tr>
     <tr>
       <th>3</th>
       <td>United States</td>
-      <td>362.2</td>
-      <td>130941.63690</td>
-      <td>82.664</td>
-      <td>269586.0</td>
-      <td>3.42287</td>
-      <td>0.964348</td>
-      <td>76.980488</td>
-      <td>2.3</td>
-      <td>5.302060</td>
+      <td>362.2000</td>
+      <td>130941.6369</td>
+      <td>82.6640</td>
+      <td>269586.0000</td>
+      <td>3.4229</td>
+      <td>0.9643</td>
+      <td>76.9805</td>
+      <td>2.3000</td>
+      <td>5.3021</td>
       <td>...</td>
-      <td>13.228593</td>
-      <td>748241.402900</td>
-      <td>33.866926</td>
-      <td>13.032828</td>
-      <td>3.343170</td>
-      <td>36.240985</td>
-      <td>87.567657</td>
-      <td>63528.63430</td>
+      <td>13.2286</td>
+      <td>748241.4029</td>
+      <td>33.8669</td>
+      <td>13.0328</td>
+      <td>3.3432</td>
+      <td>36.2410</td>
+      <td>87.5677</td>
+      <td>63528.6343</td>
       <td>VH</td>
-      <td>51.1</td>
+      <td>51.1000</td>
     </tr>
     <tr>
       <th>4</th>
       <td>Denmark</td>
-      <td>351.1</td>
-      <td>113300.60110</td>
-      <td>88.116</td>
-      <td>1261.0</td>
-      <td>2.96873</td>
-      <td>0.291641</td>
-      <td>81.602439</td>
-      <td>4.1</td>
-      <td>6.826140</td>
+      <td>351.1000</td>
+      <td>113300.6011</td>
+      <td>88.1160</td>
+      <td>1261.0000</td>
+      <td>2.9687</td>
+      <td>0.2916</td>
+      <td>81.6024</td>
+      <td>4.1000</td>
+      <td>6.8261</td>
       <td>...</td>
-      <td>65.505925</td>
-      <td>7778.773921</td>
-      <td>15.711000</td>
-      <td>4.691237</td>
-      <td>56.914456</td>
-      <td>145.785100</td>
-      <td>82.664330</td>
-      <td>60915.42440</td>
+      <td>65.5059</td>
+      <td>7778.7739</td>
+      <td>15.7110</td>
+      <td>4.6912</td>
+      <td>56.9145</td>
+      <td>145.7851</td>
+      <td>82.6643</td>
+      <td>60915.4244</td>
       <td>VH</td>
-      <td>77.9</td>
+      <td>77.9000</td>
     </tr>
   </tbody>
 </table>
@@ -444,223 +449,223 @@ display(cancer_rate.describe(include='number').transpose())
   <tbody>
     <tr>
       <th>CANRAT</th>
-      <td>177.0</td>
-      <td>183.829379</td>
-      <td>7.974340e+01</td>
-      <td>78.400000</td>
-      <td>118.100000</td>
-      <td>155.300000</td>
-      <td>240.400000</td>
-      <td>4.524000e+02</td>
+      <td>177.0000</td>
+      <td>183.8294</td>
+      <td>79.7434</td>
+      <td>78.4000</td>
+      <td>118.1000</td>
+      <td>155.3000</td>
+      <td>240.4000</td>
+      <td>452.4000</td>
     </tr>
     <tr>
       <th>GDPPER</th>
-      <td>165.0</td>
-      <td>45284.424283</td>
-      <td>3.941794e+04</td>
-      <td>1718.804896</td>
-      <td>13545.254510</td>
-      <td>34024.900890</td>
-      <td>66778.416050</td>
-      <td>2.346469e+05</td>
+      <td>165.0000</td>
+      <td>45284.4243</td>
+      <td>39417.9404</td>
+      <td>1718.8049</td>
+      <td>13545.2545</td>
+      <td>34024.9009</td>
+      <td>66778.4160</td>
+      <td>234646.9049</td>
     </tr>
     <tr>
       <th>URBPOP</th>
-      <td>174.0</td>
-      <td>59.788121</td>
-      <td>2.280640e+01</td>
-      <td>13.345000</td>
-      <td>42.432750</td>
-      <td>61.701500</td>
-      <td>79.186500</td>
-      <td>1.000000e+02</td>
+      <td>174.0000</td>
+      <td>59.7881</td>
+      <td>22.8064</td>
+      <td>13.3450</td>
+      <td>42.4327</td>
+      <td>61.7015</td>
+      <td>79.1865</td>
+      <td>100.0000</td>
     </tr>
     <tr>
       <th>PATRES</th>
-      <td>108.0</td>
-      <td>20607.388889</td>
-      <td>1.340683e+05</td>
-      <td>1.000000</td>
-      <td>35.250000</td>
-      <td>244.500000</td>
-      <td>1297.750000</td>
-      <td>1.344817e+06</td>
+      <td>108.0000</td>
+      <td>20607.3889</td>
+      <td>134068.3101</td>
+      <td>1.0000</td>
+      <td>35.2500</td>
+      <td>244.5000</td>
+      <td>1297.7500</td>
+      <td>1344817.0000</td>
     </tr>
     <tr>
       <th>RNDGDP</th>
-      <td>74.0</td>
-      <td>1.197474</td>
-      <td>1.189956e+00</td>
-      <td>0.039770</td>
-      <td>0.256372</td>
-      <td>0.873660</td>
-      <td>1.608842</td>
-      <td>5.354510e+00</td>
+      <td>74.0000</td>
+      <td>1.1975</td>
+      <td>1.1900</td>
+      <td>0.0398</td>
+      <td>0.2564</td>
+      <td>0.8737</td>
+      <td>1.6088</td>
+      <td>5.3545</td>
     </tr>
     <tr>
       <th>POPGRO</th>
-      <td>174.0</td>
-      <td>1.127028</td>
-      <td>1.197718e+00</td>
-      <td>-2.079337</td>
-      <td>0.236900</td>
-      <td>1.179959</td>
-      <td>2.031154</td>
-      <td>3.727101e+00</td>
+      <td>174.0000</td>
+      <td>1.1270</td>
+      <td>1.1977</td>
+      <td>-2.0793</td>
+      <td>0.2369</td>
+      <td>1.1800</td>
+      <td>2.0312</td>
+      <td>3.7271</td>
     </tr>
     <tr>
       <th>LIFEXP</th>
-      <td>174.0</td>
-      <td>71.746113</td>
-      <td>7.606209e+00</td>
-      <td>52.777000</td>
-      <td>65.907500</td>
-      <td>72.464610</td>
-      <td>77.523500</td>
-      <td>8.456000e+01</td>
+      <td>174.0000</td>
+      <td>71.7461</td>
+      <td>7.6062</td>
+      <td>52.7770</td>
+      <td>65.9075</td>
+      <td>72.4646</td>
+      <td>77.5235</td>
+      <td>84.5600</td>
     </tr>
     <tr>
       <th>TUBINC</th>
-      <td>174.0</td>
-      <td>105.005862</td>
-      <td>1.367229e+02</td>
-      <td>0.770000</td>
-      <td>12.000000</td>
-      <td>44.500000</td>
-      <td>147.750000</td>
-      <td>5.920000e+02</td>
+      <td>174.0000</td>
+      <td>105.0059</td>
+      <td>136.7229</td>
+      <td>0.7700</td>
+      <td>12.0000</td>
+      <td>44.5000</td>
+      <td>147.7500</td>
+      <td>592.0000</td>
     </tr>
     <tr>
       <th>DTHCMD</th>
-      <td>170.0</td>
-      <td>21.260521</td>
-      <td>1.927333e+01</td>
-      <td>1.283611</td>
-      <td>6.078009</td>
-      <td>12.456279</td>
-      <td>36.980457</td>
-      <td>6.520789e+01</td>
+      <td>170.0000</td>
+      <td>21.2605</td>
+      <td>19.2733</td>
+      <td>1.2836</td>
+      <td>6.0780</td>
+      <td>12.4563</td>
+      <td>36.9805</td>
+      <td>65.2079</td>
     </tr>
     <tr>
       <th>AGRLND</th>
-      <td>174.0</td>
-      <td>38.793456</td>
-      <td>2.171551e+01</td>
-      <td>0.512821</td>
-      <td>20.130276</td>
-      <td>40.386649</td>
-      <td>54.013754</td>
-      <td>8.084112e+01</td>
+      <td>174.0000</td>
+      <td>38.7935</td>
+      <td>21.7155</td>
+      <td>0.5128</td>
+      <td>20.1303</td>
+      <td>40.3866</td>
+      <td>54.0138</td>
+      <td>80.8411</td>
     </tr>
     <tr>
       <th>GHGEMI</th>
-      <td>170.0</td>
-      <td>259582.709895</td>
-      <td>1.118550e+06</td>
-      <td>179.725150</td>
-      <td>12527.487367</td>
-      <td>41009.275980</td>
-      <td>116482.578575</td>
-      <td>1.294287e+07</td>
+      <td>170.0000</td>
+      <td>259582.7099</td>
+      <td>1118549.7301</td>
+      <td>179.7252</td>
+      <td>12527.4874</td>
+      <td>41009.2760</td>
+      <td>116482.5786</td>
+      <td>12942868.3400</td>
     </tr>
     <tr>
       <th>RELOUT</th>
-      <td>153.0</td>
-      <td>39.760036</td>
-      <td>3.191492e+01</td>
-      <td>0.000296</td>
-      <td>10.582691</td>
-      <td>32.381668</td>
-      <td>63.011450</td>
-      <td>1.000000e+02</td>
+      <td>153.0000</td>
+      <td>39.7600</td>
+      <td>31.9149</td>
+      <td>0.0003</td>
+      <td>10.5827</td>
+      <td>32.3817</td>
+      <td>63.0115</td>
+      <td>100.0000</td>
     </tr>
     <tr>
       <th>METEMI</th>
-      <td>170.0</td>
-      <td>47876.133575</td>
-      <td>1.346611e+05</td>
-      <td>11.596147</td>
-      <td>3662.884908</td>
-      <td>11118.976025</td>
-      <td>32368.909040</td>
-      <td>1.186285e+06</td>
+      <td>170.0000</td>
+      <td>47876.1336</td>
+      <td>134661.0653</td>
+      <td>11.5961</td>
+      <td>3662.8849</td>
+      <td>11118.9760</td>
+      <td>32368.9090</td>
+      <td>1186285.1810</td>
     </tr>
     <tr>
       <th>FORARE</th>
-      <td>173.0</td>
-      <td>32.218177</td>
-      <td>2.312001e+01</td>
-      <td>0.008078</td>
-      <td>11.604388</td>
-      <td>31.509048</td>
-      <td>49.071780</td>
-      <td>9.741212e+01</td>
+      <td>173.0000</td>
+      <td>32.2182</td>
+      <td>23.1200</td>
+      <td>0.0081</td>
+      <td>11.6044</td>
+      <td>31.5090</td>
+      <td>49.0718</td>
+      <td>97.4121</td>
     </tr>
     <tr>
       <th>CO2EMI</th>
-      <td>170.0</td>
-      <td>3.751097</td>
-      <td>4.606479e+00</td>
-      <td>0.032585</td>
-      <td>0.631924</td>
-      <td>2.298368</td>
-      <td>4.823496</td>
-      <td>3.172684e+01</td>
+      <td>170.0000</td>
+      <td>3.7511</td>
+      <td>4.6065</td>
+      <td>0.0326</td>
+      <td>0.6319</td>
+      <td>2.2984</td>
+      <td>4.8235</td>
+      <td>31.7268</td>
     </tr>
     <tr>
       <th>PM2EXP</th>
-      <td>167.0</td>
-      <td>91.940595</td>
-      <td>2.206003e+01</td>
-      <td>0.274092</td>
-      <td>99.627134</td>
-      <td>100.000000</td>
-      <td>100.000000</td>
-      <td>1.000000e+02</td>
+      <td>167.0000</td>
+      <td>91.9406</td>
+      <td>22.0600</td>
+      <td>0.2741</td>
+      <td>99.6271</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
     </tr>
     <tr>
       <th>POPDEN</th>
-      <td>174.0</td>
-      <td>200.886765</td>
-      <td>6.453834e+02</td>
-      <td>2.115134</td>
-      <td>27.454539</td>
-      <td>77.983133</td>
-      <td>153.993650</td>
-      <td>7.918951e+03</td>
+      <td>174.0000</td>
+      <td>200.8868</td>
+      <td>645.3834</td>
+      <td>2.1151</td>
+      <td>27.4545</td>
+      <td>77.9831</td>
+      <td>153.9936</td>
+      <td>7918.9513</td>
     </tr>
     <tr>
       <th>ENRTER</th>
-      <td>116.0</td>
-      <td>49.994997</td>
-      <td>2.970619e+01</td>
-      <td>2.432581</td>
-      <td>22.107195</td>
-      <td>53.392460</td>
-      <td>71.057467</td>
-      <td>1.433107e+02</td>
+      <td>116.0000</td>
+      <td>49.9950</td>
+      <td>29.7062</td>
+      <td>2.4326</td>
+      <td>22.1072</td>
+      <td>53.3925</td>
+      <td>71.0575</td>
+      <td>143.3107</td>
     </tr>
     <tr>
       <th>GDPCAP</th>
-      <td>170.0</td>
-      <td>13992.095610</td>
-      <td>1.957954e+04</td>
-      <td>216.827417</td>
-      <td>1870.503029</td>
-      <td>5348.192875</td>
-      <td>17421.116227</td>
-      <td>1.173705e+05</td>
+      <td>170.0000</td>
+      <td>13992.0956</td>
+      <td>19579.5430</td>
+      <td>216.8274</td>
+      <td>1870.5030</td>
+      <td>5348.1929</td>
+      <td>17421.1162</td>
+      <td>117370.4969</td>
     </tr>
     <tr>
       <th>EPISCO</th>
-      <td>165.0</td>
-      <td>42.946667</td>
-      <td>1.249086e+01</td>
-      <td>18.900000</td>
-      <td>33.000000</td>
-      <td>40.900000</td>
-      <td>50.500000</td>
-      <td>7.790000e+01</td>
+      <td>165.0000</td>
+      <td>42.9467</td>
+      <td>12.4909</td>
+      <td>18.9000</td>
+      <td>33.0000</td>
+      <td>40.9000</td>
+      <td>50.5000</td>
+      <td>77.9000</td>
     </tr>
   </tbody>
 </table>
@@ -936,7 +941,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>177</td>
       <td>0</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>1</th>
@@ -945,7 +950,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>177</td>
       <td>0</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>2</th>
@@ -954,7 +959,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>165</td>
       <td>12</td>
-      <td>0.932203</td>
+      <td>0.9322</td>
     </tr>
     <tr>
       <th>3</th>
@@ -963,7 +968,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>4</th>
@@ -972,7 +977,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>108</td>
       <td>69</td>
-      <td>0.610169</td>
+      <td>0.6102</td>
     </tr>
     <tr>
       <th>5</th>
@@ -981,7 +986,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>74</td>
       <td>103</td>
-      <td>0.418079</td>
+      <td>0.4181</td>
     </tr>
     <tr>
       <th>6</th>
@@ -990,7 +995,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>7</th>
@@ -999,7 +1004,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>8</th>
@@ -1008,7 +1013,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>9</th>
@@ -1017,7 +1022,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>10</th>
@@ -1026,7 +1031,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>11</th>
@@ -1035,7 +1040,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>12</th>
@@ -1044,7 +1049,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>153</td>
       <td>24</td>
-      <td>0.864407</td>
+      <td>0.8644</td>
     </tr>
     <tr>
       <th>13</th>
@@ -1053,7 +1058,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>14</th>
@@ -1062,7 +1067,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>173</td>
       <td>4</td>
-      <td>0.977401</td>
+      <td>0.9774</td>
     </tr>
     <tr>
       <th>15</th>
@@ -1071,7 +1076,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>16</th>
@@ -1080,7 +1085,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>167</td>
       <td>10</td>
-      <td>0.943503</td>
+      <td>0.9435</td>
     </tr>
     <tr>
       <th>17</th>
@@ -1089,7 +1094,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>18</th>
@@ -1098,7 +1103,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>116</td>
       <td>61</td>
-      <td>0.655367</td>
+      <td>0.6554</td>
     </tr>
     <tr>
       <th>19</th>
@@ -1107,7 +1112,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>20</th>
@@ -1116,7 +1121,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>167</td>
       <td>10</td>
-      <td>0.943503</td>
+      <td>0.9435</td>
     </tr>
     <tr>
       <th>21</th>
@@ -1125,7 +1130,7 @@ display(all_column_quality_summary)
       <td>177</td>
       <td>165</td>
       <td>12</td>
-      <td>0.932203</td>
+      <td>0.9322</td>
     </tr>
   </tbody>
 </table>
@@ -1192,7 +1197,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>74</td>
       <td>103</td>
-      <td>0.418079</td>
+      <td>0.4181</td>
     </tr>
     <tr>
       <th>4</th>
@@ -1201,7 +1206,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>108</td>
       <td>69</td>
-      <td>0.610169</td>
+      <td>0.6102</td>
     </tr>
     <tr>
       <th>18</th>
@@ -1210,7 +1215,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>116</td>
       <td>61</td>
-      <td>0.655367</td>
+      <td>0.6554</td>
     </tr>
     <tr>
       <th>12</th>
@@ -1219,7 +1224,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>153</td>
       <td>24</td>
-      <td>0.864407</td>
+      <td>0.8644</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1228,7 +1233,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>165</td>
       <td>12</td>
-      <td>0.932203</td>
+      <td>0.9322</td>
     </tr>
     <tr>
       <th>21</th>
@@ -1237,7 +1242,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>165</td>
       <td>12</td>
-      <td>0.932203</td>
+      <td>0.9322</td>
     </tr>
     <tr>
       <th>20</th>
@@ -1246,7 +1251,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>167</td>
       <td>10</td>
-      <td>0.943503</td>
+      <td>0.9435</td>
     </tr>
     <tr>
       <th>16</th>
@@ -1255,7 +1260,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>167</td>
       <td>10</td>
-      <td>0.943503</td>
+      <td>0.9435</td>
     </tr>
     <tr>
       <th>9</th>
@@ -1264,7 +1269,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>13</th>
@@ -1273,7 +1278,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>15</th>
@@ -1282,7 +1287,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>19</th>
@@ -1291,7 +1296,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>11</th>
@@ -1300,7 +1305,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>170</td>
       <td>7</td>
-      <td>0.960452</td>
+      <td>0.9605</td>
     </tr>
     <tr>
       <th>14</th>
@@ -1309,7 +1314,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>173</td>
       <td>4</td>
-      <td>0.977401</td>
+      <td>0.9774</td>
     </tr>
     <tr>
       <th>8</th>
@@ -1318,7 +1323,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>10</th>
@@ -1327,7 +1332,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>6</th>
@@ -1336,7 +1341,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>17</th>
@@ -1345,7 +1350,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1354,7 +1359,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
     <tr>
       <th>7</th>
@@ -1363,7 +1368,7 @@ display(all_column_quality_summary[(all_column_quality_summary['Fill.Rate']<1)].
       <td>177</td>
       <td>174</td>
       <td>3</td>
-      <td>0.983051</td>
+      <td>0.9831</td>
     </tr>
   </tbody>
 </table>
@@ -1459,35 +1464,35 @@ display(all_row_quality_summary)
       <td>Australia</td>
       <td>22</td>
       <td>1</td>
-      <td>0.045455</td>
+      <td>0.0455</td>
     </tr>
     <tr>
       <th>1</th>
       <td>New Zealand</td>
       <td>22</td>
       <td>2</td>
-      <td>0.090909</td>
+      <td>0.0909</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Ireland</td>
       <td>22</td>
       <td>0</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>3</th>
       <td>United States</td>
       <td>22</td>
       <td>0</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>4</th>
       <td>Denmark</td>
       <td>22</td>
       <td>0</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1501,35 +1506,35 @@ display(all_row_quality_summary)
       <td>Congo Republic</td>
       <td>22</td>
       <td>3</td>
-      <td>0.136364</td>
+      <td>0.1364</td>
     </tr>
     <tr>
       <th>173</th>
       <td>Bhutan</td>
       <td>22</td>
       <td>2</td>
-      <td>0.090909</td>
+      <td>0.0909</td>
     </tr>
     <tr>
       <th>174</th>
       <td>Nepal</td>
       <td>22</td>
       <td>2</td>
-      <td>0.090909</td>
+      <td>0.0909</td>
     </tr>
     <tr>
       <th>175</th>
       <td>Gambia</td>
       <td>22</td>
       <td>4</td>
-      <td>0.181818</td>
+      <td>0.1818</td>
     </tr>
     <tr>
       <th>176</th>
       <td>Niger</td>
       <td>22</td>
       <td>2</td>
-      <td>0.090909</td>
+      <td>0.0909</td>
     </tr>
   </tbody>
 </table>
@@ -1618,98 +1623,98 @@ display(all_row_quality_summary[(all_row_quality_summary['Missing.Rate']>0.20)].
       <td>Guadeloupe</td>
       <td>22</td>
       <td>20</td>
-      <td>0.909091</td>
+      <td>0.9091</td>
     </tr>
     <tr>
       <th>39</th>
       <td>Martinique</td>
       <td>22</td>
       <td>20</td>
-      <td>0.909091</td>
+      <td>0.9091</td>
     </tr>
     <tr>
       <th>56</th>
       <td>French Guiana</td>
       <td>22</td>
       <td>20</td>
-      <td>0.909091</td>
+      <td>0.9091</td>
     </tr>
     <tr>
       <th>13</th>
       <td>New Caledonia</td>
       <td>22</td>
       <td>11</td>
-      <td>0.500000</td>
+      <td>0.5000</td>
     </tr>
     <tr>
       <th>44</th>
       <td>French Polynesia</td>
       <td>22</td>
       <td>11</td>
-      <td>0.500000</td>
+      <td>0.5000</td>
     </tr>
     <tr>
       <th>75</th>
       <td>Guam</td>
       <td>22</td>
       <td>11</td>
-      <td>0.500000</td>
+      <td>0.5000</td>
     </tr>
     <tr>
       <th>53</th>
       <td>Puerto Rico</td>
       <td>22</td>
       <td>9</td>
-      <td>0.409091</td>
+      <td>0.4091</td>
     </tr>
     <tr>
       <th>85</th>
       <td>North Korea</td>
       <td>22</td>
       <td>6</td>
-      <td>0.272727</td>
+      <td>0.2727</td>
     </tr>
     <tr>
       <th>132</th>
       <td>Somalia</td>
       <td>22</td>
       <td>6</td>
-      <td>0.272727</td>
+      <td>0.2727</td>
     </tr>
     <tr>
       <th>168</th>
       <td>South Sudan</td>
       <td>22</td>
       <td>6</td>
-      <td>0.272727</td>
+      <td>0.2727</td>
     </tr>
     <tr>
       <th>73</th>
       <td>Venezuela</td>
       <td>22</td>
       <td>5</td>
-      <td>0.227273</td>
+      <td>0.2273</td>
     </tr>
     <tr>
       <th>117</th>
       <td>Libya</td>
       <td>22</td>
       <td>5</td>
-      <td>0.227273</td>
+      <td>0.2273</td>
     </tr>
     <tr>
       <th>161</th>
       <td>Eritrea</td>
       <td>22</td>
       <td>5</td>
-      <td>0.227273</td>
+      <td>0.2273</td>
     </tr>
     <tr>
       <th>164</th>
       <td>Yemen</td>
       <td>22</td>
       <td>5</td>
-      <td>0.227273</td>
+      <td>0.2273</td>
     </tr>
   </tbody>
 </table>
@@ -1920,362 +1925,362 @@ display(numeric_column_quality_summary)
     <tr>
       <th>0</th>
       <td>CANRAT</td>
-      <td>78.400000</td>
-      <td>183.829379</td>
-      <td>155.300000</td>
-      <td>4.524000e+02</td>
-      <td>135.300000</td>
-      <td>106.700000</td>
+      <td>78.4000</td>
+      <td>183.8294</td>
+      <td>155.3000</td>
+      <td>452.4000</td>
+      <td>135.3000</td>
+      <td>106.7000</td>
       <td>3</td>
       <td>2</td>
-      <td>1.500000</td>
+      <td>1.5000</td>
       <td>167</td>
       <td>177</td>
-      <td>0.943503</td>
-      <td>0.881825</td>
-      <td>0.063467</td>
+      <td>0.9435</td>
+      <td>0.8818</td>
+      <td>0.0635</td>
     </tr>
     <tr>
       <th>1</th>
       <td>GDPPER</td>
-      <td>1718.804896</td>
-      <td>45284.424283</td>
-      <td>34024.900890</td>
-      <td>2.346469e+05</td>
-      <td>98380.636010</td>
-      <td>42154.178100</td>
+      <td>1718.8049</td>
+      <td>45284.4243</td>
+      <td>34024.9009</td>
+      <td>234646.9049</td>
+      <td>98380.6360</td>
+      <td>42154.1781</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>165</td>
       <td>177</td>
-      <td>0.932203</td>
-      <td>1.517574</td>
-      <td>3.471992</td>
+      <td>0.9322</td>
+      <td>1.5176</td>
+      <td>3.4720</td>
     </tr>
     <tr>
       <th>2</th>
       <td>URBPOP</td>
-      <td>13.345000</td>
-      <td>59.788121</td>
-      <td>61.701500</td>
-      <td>1.000000e+02</td>
-      <td>100.000000</td>
-      <td>52.516000</td>
+      <td>13.3450</td>
+      <td>59.7881</td>
+      <td>61.7015</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>52.5160</td>
       <td>2</td>
       <td>1</td>
-      <td>2.000000</td>
+      <td>2.0000</td>
       <td>173</td>
       <td>177</td>
-      <td>0.977401</td>
-      <td>-0.210702</td>
-      <td>-0.962847</td>
+      <td>0.9774</td>
+      <td>-0.2107</td>
+      <td>-0.9628</td>
     </tr>
     <tr>
       <th>3</th>
       <td>PATRES</td>
-      <td>1.000000</td>
-      <td>20607.388889</td>
-      <td>244.500000</td>
-      <td>1.344817e+06</td>
-      <td>6.000000</td>
-      <td>2.000000</td>
+      <td>1.0000</td>
+      <td>20607.3889</td>
+      <td>244.5000</td>
+      <td>1344817.0000</td>
+      <td>6.0000</td>
+      <td>2.0000</td>
       <td>4</td>
       <td>3</td>
-      <td>1.333333</td>
+      <td>1.3333</td>
       <td>97</td>
       <td>177</td>
-      <td>0.548023</td>
-      <td>9.284436</td>
-      <td>91.187178</td>
+      <td>0.5480</td>
+      <td>9.2844</td>
+      <td>91.1872</td>
     </tr>
     <tr>
       <th>4</th>
       <td>RNDGDP</td>
-      <td>0.039770</td>
-      <td>1.197474</td>
-      <td>0.873660</td>
-      <td>5.354510e+00</td>
-      <td>1.232440</td>
-      <td>0.962180</td>
+      <td>0.0398</td>
+      <td>1.1975</td>
+      <td>0.8737</td>
+      <td>5.3545</td>
+      <td>1.2324</td>
+      <td>0.9622</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>74</td>
       <td>177</td>
-      <td>0.418079</td>
-      <td>1.396742</td>
-      <td>1.695957</td>
+      <td>0.4181</td>
+      <td>1.3967</td>
+      <td>1.6960</td>
     </tr>
     <tr>
       <th>5</th>
       <td>POPGRO</td>
-      <td>-2.079337</td>
-      <td>1.127028</td>
-      <td>1.179959</td>
-      <td>3.727101e+00</td>
-      <td>1.235701</td>
-      <td>1.483129</td>
+      <td>-2.0793</td>
+      <td>1.1270</td>
+      <td>1.1800</td>
+      <td>3.7271</td>
+      <td>1.2357</td>
+      <td>1.4831</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>174</td>
       <td>177</td>
-      <td>0.983051</td>
-      <td>-0.195161</td>
-      <td>-0.423580</td>
+      <td>0.9831</td>
+      <td>-0.1952</td>
+      <td>-0.4236</td>
     </tr>
     <tr>
       <th>6</th>
       <td>LIFEXP</td>
-      <td>52.777000</td>
-      <td>71.746113</td>
-      <td>72.464610</td>
-      <td>8.456000e+01</td>
-      <td>83.200000</td>
-      <td>68.687000</td>
+      <td>52.7770</td>
+      <td>71.7461</td>
+      <td>72.4646</td>
+      <td>84.5600</td>
+      <td>83.2000</td>
+      <td>68.6870</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>174</td>
       <td>177</td>
-      <td>0.983051</td>
-      <td>-0.357965</td>
-      <td>-0.649601</td>
+      <td>0.9831</td>
+      <td>-0.3580</td>
+      <td>-0.6496</td>
     </tr>
     <tr>
       <th>7</th>
       <td>TUBINC</td>
-      <td>0.770000</td>
-      <td>105.005862</td>
-      <td>44.500000</td>
-      <td>5.920000e+02</td>
-      <td>12.000000</td>
-      <td>7.200000</td>
+      <td>0.7700</td>
+      <td>105.0059</td>
+      <td>44.5000</td>
+      <td>592.0000</td>
+      <td>12.0000</td>
+      <td>7.2000</td>
       <td>4</td>
       <td>3</td>
-      <td>1.333333</td>
+      <td>1.3333</td>
       <td>131</td>
       <td>177</td>
-      <td>0.740113</td>
-      <td>1.746333</td>
-      <td>2.429368</td>
+      <td>0.7401</td>
+      <td>1.7463</td>
+      <td>2.4294</td>
     </tr>
     <tr>
       <th>8</th>
       <td>DTHCMD</td>
-      <td>1.283611</td>
-      <td>21.260521</td>
-      <td>12.456279</td>
-      <td>6.520789e+01</td>
-      <td>4.941054</td>
-      <td>42.079403</td>
+      <td>1.2836</td>
+      <td>21.2605</td>
+      <td>12.4563</td>
+      <td>65.2079</td>
+      <td>4.9411</td>
+      <td>42.0794</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>170</td>
       <td>177</td>
-      <td>0.960452</td>
-      <td>0.900509</td>
-      <td>-0.691541</td>
+      <td>0.9605</td>
+      <td>0.9005</td>
+      <td>-0.6915</td>
     </tr>
     <tr>
       <th>9</th>
       <td>AGRLND</td>
-      <td>0.512821</td>
-      <td>38.793456</td>
-      <td>40.386649</td>
-      <td>8.084112e+01</td>
-      <td>46.252480</td>
-      <td>72.006469</td>
+      <td>0.5128</td>
+      <td>38.7935</td>
+      <td>40.3866</td>
+      <td>80.8411</td>
+      <td>46.2525</td>
+      <td>72.0065</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>174</td>
       <td>177</td>
-      <td>0.983051</td>
-      <td>0.074000</td>
-      <td>-0.926249</td>
+      <td>0.9831</td>
+      <td>0.0740</td>
+      <td>-0.9262</td>
     </tr>
     <tr>
       <th>10</th>
       <td>GHGEMI</td>
-      <td>179.725150</td>
-      <td>259582.709895</td>
-      <td>41009.275980</td>
-      <td>1.294287e+07</td>
-      <td>571903.119900</td>
-      <td>3000.932259</td>
+      <td>179.7252</td>
+      <td>259582.7099</td>
+      <td>41009.2760</td>
+      <td>12942868.3400</td>
+      <td>571903.1199</td>
+      <td>3000.9323</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>170</td>
       <td>177</td>
-      <td>0.960452</td>
-      <td>9.496120</td>
-      <td>101.637308</td>
+      <td>0.9605</td>
+      <td>9.4961</td>
+      <td>101.6373</td>
     </tr>
     <tr>
       <th>11</th>
       <td>RELOUT</td>
-      <td>0.000296</td>
-      <td>39.760036</td>
-      <td>32.381668</td>
-      <td>1.000000e+02</td>
-      <td>100.000000</td>
-      <td>13.637841</td>
+      <td>0.0003</td>
+      <td>39.7600</td>
+      <td>32.3817</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>13.6378</td>
       <td>3</td>
       <td>1</td>
-      <td>3.000000</td>
+      <td>3.0000</td>
       <td>151</td>
       <td>177</td>
-      <td>0.853107</td>
-      <td>0.501088</td>
-      <td>-0.981774</td>
+      <td>0.8531</td>
+      <td>0.5011</td>
+      <td>-0.9818</td>
     </tr>
     <tr>
       <th>12</th>
       <td>METEMI</td>
-      <td>11.596147</td>
-      <td>47876.133575</td>
-      <td>11118.976025</td>
-      <td>1.186285e+06</td>
-      <td>131484.763200</td>
-      <td>1326.034028</td>
+      <td>11.5961</td>
+      <td>47876.1336</td>
+      <td>11118.9760</td>
+      <td>1186285.1810</td>
+      <td>131484.7632</td>
+      <td>1326.0340</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>170</td>
       <td>177</td>
-      <td>0.960452</td>
-      <td>5.801014</td>
-      <td>38.661386</td>
+      <td>0.9605</td>
+      <td>5.8010</td>
+      <td>38.6614</td>
     </tr>
     <tr>
       <th>13</th>
       <td>FORARE</td>
-      <td>0.008078</td>
-      <td>32.218177</td>
-      <td>31.509048</td>
-      <td>9.741212e+01</td>
-      <td>17.421315</td>
-      <td>8.782159</td>
+      <td>0.0081</td>
+      <td>32.2182</td>
+      <td>31.5090</td>
+      <td>97.4121</td>
+      <td>17.4213</td>
+      <td>8.7822</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>173</td>
       <td>177</td>
-      <td>0.977401</td>
-      <td>0.519277</td>
-      <td>-0.322589</td>
+      <td>0.9774</td>
+      <td>0.5193</td>
+      <td>-0.3226</td>
     </tr>
     <tr>
       <th>14</th>
       <td>CO2EMI</td>
-      <td>0.032585</td>
-      <td>3.751097</td>
-      <td>2.298368</td>
-      <td>3.172684e+01</td>
-      <td>14.772658</td>
-      <td>0.972088</td>
+      <td>0.0326</td>
+      <td>3.7511</td>
+      <td>2.2984</td>
+      <td>31.7268</td>
+      <td>14.7727</td>
+      <td>0.9721</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>170</td>
       <td>177</td>
-      <td>0.960452</td>
-      <td>2.721552</td>
-      <td>10.311574</td>
+      <td>0.9605</td>
+      <td>2.7216</td>
+      <td>10.3116</td>
     </tr>
     <tr>
       <th>15</th>
       <td>PM2EXP</td>
-      <td>0.274092</td>
-      <td>91.940595</td>
-      <td>100.000000</td>
-      <td>1.000000e+02</td>
-      <td>100.000000</td>
-      <td>100.000000</td>
+      <td>0.2741</td>
+      <td>91.9406</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
       <td>106</td>
       <td>2</td>
-      <td>53.000000</td>
+      <td>53.0000</td>
       <td>61</td>
       <td>177</td>
-      <td>0.344633</td>
-      <td>-3.141557</td>
-      <td>9.032386</td>
+      <td>0.3446</td>
+      <td>-3.1416</td>
+      <td>9.0324</td>
     </tr>
     <tr>
       <th>16</th>
       <td>POPDEN</td>
-      <td>2.115134</td>
-      <td>200.886765</td>
-      <td>77.983133</td>
-      <td>7.918951e+03</td>
-      <td>3.335312</td>
-      <td>13.300785</td>
+      <td>2.1151</td>
+      <td>200.8868</td>
+      <td>77.9831</td>
+      <td>7918.9513</td>
+      <td>3.3353</td>
+      <td>13.3008</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>174</td>
       <td>177</td>
-      <td>0.983051</td>
-      <td>10.267750</td>
-      <td>119.995256</td>
+      <td>0.9831</td>
+      <td>10.2678</td>
+      <td>119.9953</td>
     </tr>
     <tr>
       <th>17</th>
       <td>ENRTER</td>
-      <td>2.432581</td>
-      <td>49.994997</td>
-      <td>53.392460</td>
-      <td>1.433107e+02</td>
-      <td>110.139221</td>
-      <td>45.220661</td>
+      <td>2.4326</td>
+      <td>49.9950</td>
+      <td>53.3925</td>
+      <td>143.3107</td>
+      <td>110.1392</td>
+      <td>45.2207</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>116</td>
       <td>177</td>
-      <td>0.655367</td>
-      <td>0.275863</td>
-      <td>-0.392895</td>
+      <td>0.6554</td>
+      <td>0.2759</td>
+      <td>-0.3929</td>
     </tr>
     <tr>
       <th>18</th>
       <td>GDPCAP</td>
-      <td>216.827417</td>
-      <td>13992.095610</td>
-      <td>5348.192875</td>
-      <td>1.173705e+05</td>
-      <td>51722.069000</td>
-      <td>3961.726633</td>
+      <td>216.8274</td>
+      <td>13992.0956</td>
+      <td>5348.1929</td>
+      <td>117370.4969</td>
+      <td>51722.0690</td>
+      <td>3961.7266</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>170</td>
       <td>177</td>
-      <td>0.960452</td>
-      <td>2.258568</td>
-      <td>5.938690</td>
+      <td>0.9605</td>
+      <td>2.2586</td>
+      <td>5.9387</td>
     </tr>
     <tr>
       <th>19</th>
       <td>EPISCO</td>
-      <td>18.900000</td>
-      <td>42.946667</td>
-      <td>40.900000</td>
-      <td>7.790000e+01</td>
-      <td>29.600000</td>
-      <td>43.600000</td>
+      <td>18.9000</td>
+      <td>42.9467</td>
+      <td>40.9000</td>
+      <td>77.9000</td>
+      <td>29.6000</td>
+      <td>43.6000</td>
       <td>3</td>
       <td>3</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>137</td>
       <td>177</td>
-      <td>0.774011</td>
-      <td>0.641799</td>
-      <td>0.035208</td>
+      <td>0.7740</td>
+      <td>0.6418</td>
+      <td>0.0352</td>
     </tr>
   </tbody>
 </table>
@@ -2347,20 +2352,20 @@ display(numeric_column_quality_summary[(numeric_column_quality_summary['First.Se
     <tr>
       <th>15</th>
       <td>PM2EXP</td>
-      <td>0.274092</td>
-      <td>91.940595</td>
-      <td>100.0</td>
-      <td>100.0</td>
-      <td>100.0</td>
-      <td>100.0</td>
+      <td>0.2741</td>
+      <td>91.9406</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
       <td>106</td>
       <td>2</td>
-      <td>53.0</td>
+      <td>53.0000</td>
       <td>61</td>
       <td>177</td>
-      <td>0.344633</td>
-      <td>-3.141557</td>
-      <td>9.032386</td>
+      <td>0.3446</td>
+      <td>-3.1416</td>
+      <td>9.0324</td>
     </tr>
   </tbody>
 </table>
@@ -2448,92 +2453,92 @@ display(numeric_column_quality_summary[(numeric_column_quality_summary['Skewness
     <tr>
       <th>16</th>
       <td>POPDEN</td>
-      <td>2.115134</td>
-      <td>200.886765</td>
-      <td>77.983133</td>
-      <td>7.918951e+03</td>
-      <td>3.335312</td>
-      <td>13.300785</td>
+      <td>2.1151</td>
+      <td>200.8868</td>
+      <td>77.9831</td>
+      <td>7918.9513</td>
+      <td>3.3353</td>
+      <td>13.3008</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>174</td>
       <td>177</td>
-      <td>0.983051</td>
-      <td>10.267750</td>
-      <td>119.995256</td>
+      <td>0.9831</td>
+      <td>10.2678</td>
+      <td>119.9953</td>
     </tr>
     <tr>
       <th>10</th>
       <td>GHGEMI</td>
-      <td>179.725150</td>
-      <td>259582.709895</td>
-      <td>41009.275980</td>
-      <td>1.294287e+07</td>
-      <td>571903.119900</td>
-      <td>3000.932259</td>
+      <td>179.7252</td>
+      <td>259582.7099</td>
+      <td>41009.2760</td>
+      <td>12942868.3400</td>
+      <td>571903.1199</td>
+      <td>3000.9323</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>170</td>
       <td>177</td>
-      <td>0.960452</td>
-      <td>9.496120</td>
-      <td>101.637308</td>
+      <td>0.9605</td>
+      <td>9.4961</td>
+      <td>101.6373</td>
     </tr>
     <tr>
       <th>3</th>
       <td>PATRES</td>
-      <td>1.000000</td>
-      <td>20607.388889</td>
-      <td>244.500000</td>
-      <td>1.344817e+06</td>
-      <td>6.000000</td>
-      <td>2.000000</td>
+      <td>1.0000</td>
+      <td>20607.3889</td>
+      <td>244.5000</td>
+      <td>1344817.0000</td>
+      <td>6.0000</td>
+      <td>2.0000</td>
       <td>4</td>
       <td>3</td>
-      <td>1.333333</td>
+      <td>1.3333</td>
       <td>97</td>
       <td>177</td>
-      <td>0.548023</td>
-      <td>9.284436</td>
-      <td>91.187178</td>
+      <td>0.5480</td>
+      <td>9.2844</td>
+      <td>91.1872</td>
     </tr>
     <tr>
       <th>12</th>
       <td>METEMI</td>
-      <td>11.596147</td>
-      <td>47876.133575</td>
-      <td>11118.976025</td>
-      <td>1.186285e+06</td>
-      <td>131484.763200</td>
-      <td>1326.034028</td>
+      <td>11.5961</td>
+      <td>47876.1336</td>
+      <td>11118.9760</td>
+      <td>1186285.1810</td>
+      <td>131484.7632</td>
+      <td>1326.0340</td>
       <td>1</td>
       <td>1</td>
-      <td>1.000000</td>
+      <td>1.0000</td>
       <td>170</td>
       <td>177</td>
-      <td>0.960452</td>
-      <td>5.801014</td>
-      <td>38.661386</td>
+      <td>0.9605</td>
+      <td>5.8010</td>
+      <td>38.6614</td>
     </tr>
     <tr>
       <th>15</th>
       <td>PM2EXP</td>
-      <td>0.274092</td>
-      <td>91.940595</td>
-      <td>100.000000</td>
-      <td>1.000000e+02</td>
-      <td>100.000000</td>
-      <td>100.000000</td>
+      <td>0.2741</td>
+      <td>91.9406</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
+      <td>100.0000</td>
       <td>106</td>
       <td>2</td>
-      <td>53.000000</td>
+      <td>53.0000</td>
       <td>61</td>
       <td>177</td>
-      <td>0.344633</td>
-      <td>-3.141557</td>
-      <td>9.032386</td>
+      <td>0.3446</td>
+      <td>-3.1416</td>
+      <td>9.0324</td>
     </tr>
   </tbody>
 </table>
@@ -2682,10 +2687,10 @@ display(object_column_quality_summary)
       <td>Mauritius</td>
       <td>1</td>
       <td>1</td>
-      <td>1.0</td>
+      <td>1.0000</td>
       <td>177</td>
       <td>177</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
   </tbody>
 </table>
@@ -2866,10 +2871,10 @@ display(categorical_column_quality_summary)
       <td>H</td>
       <td>59</td>
       <td>39</td>
-      <td>1.512821</td>
+      <td>1.5128</td>
       <td>4</td>
       <td>177</td>
-      <td>0.022599</td>
+      <td>0.0226</td>
     </tr>
   </tbody>
 </table>
@@ -3308,98 +3313,98 @@ cancer_rate_cleaned_numeric.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>452.4</td>
-      <td>98380.63601</td>
-      <td>86.241</td>
-      <td>1.235701</td>
-      <td>83.200000</td>
-      <td>7.2</td>
-      <td>4.941054</td>
-      <td>46.252480</td>
-      <td>5.719031e+05</td>
-      <td>131484.763200</td>
-      <td>17.421315</td>
-      <td>14.772658</td>
-      <td>24.893584</td>
-      <td>3.335312</td>
-      <td>51722.06900</td>
-      <td>60.1</td>
+      <td>452.4000</td>
+      <td>98380.6360</td>
+      <td>86.2410</td>
+      <td>1.2357</td>
+      <td>83.2000</td>
+      <td>7.2000</td>
+      <td>4.9411</td>
+      <td>46.2525</td>
+      <td>571903.1199</td>
+      <td>131484.7632</td>
+      <td>17.4213</td>
+      <td>14.7727</td>
+      <td>24.8936</td>
+      <td>3.3353</td>
+      <td>51722.0690</td>
+      <td>60.1000</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>422.9</td>
-      <td>77541.76438</td>
-      <td>86.699</td>
-      <td>2.204789</td>
-      <td>82.256098</td>
-      <td>7.2</td>
-      <td>4.354730</td>
-      <td>38.562911</td>
-      <td>8.015803e+04</td>
-      <td>32241.937000</td>
-      <td>37.570126</td>
-      <td>6.160799</td>
+      <td>422.9000</td>
+      <td>77541.7644</td>
+      <td>86.6990</td>
+      <td>2.2048</td>
+      <td>82.2561</td>
+      <td>7.2000</td>
+      <td>4.3547</td>
+      <td>38.5629</td>
+      <td>80158.0258</td>
+      <td>32241.9370</td>
+      <td>37.5701</td>
+      <td>6.1608</td>
       <td>NaN</td>
-      <td>19.331586</td>
-      <td>41760.59478</td>
-      <td>56.7</td>
+      <td>19.3316</td>
+      <td>41760.5948</td>
+      <td>56.7000</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>372.8</td>
-      <td>198405.87500</td>
-      <td>63.653</td>
-      <td>1.029111</td>
-      <td>82.556098</td>
-      <td>5.3</td>
-      <td>5.684596</td>
-      <td>65.495718</td>
-      <td>5.949773e+04</td>
-      <td>15252.824630</td>
-      <td>11.351720</td>
-      <td>6.768228</td>
-      <td>0.274092</td>
-      <td>72.367281</td>
-      <td>85420.19086</td>
-      <td>57.4</td>
+      <td>372.8000</td>
+      <td>198405.8750</td>
+      <td>63.6530</td>
+      <td>1.0291</td>
+      <td>82.5561</td>
+      <td>5.3000</td>
+      <td>5.6846</td>
+      <td>65.4957</td>
+      <td>59497.7347</td>
+      <td>15252.8246</td>
+      <td>11.3517</td>
+      <td>6.7682</td>
+      <td>0.2741</td>
+      <td>72.3673</td>
+      <td>85420.1909</td>
+      <td>57.4000</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>362.2</td>
-      <td>130941.63690</td>
-      <td>82.664</td>
-      <td>0.964348</td>
-      <td>76.980488</td>
-      <td>2.3</td>
-      <td>5.302060</td>
-      <td>44.363367</td>
-      <td>5.505181e+06</td>
-      <td>748241.402900</td>
-      <td>33.866926</td>
-      <td>13.032828</td>
-      <td>3.343170</td>
-      <td>36.240985</td>
-      <td>63528.63430</td>
-      <td>51.1</td>
+      <td>362.2000</td>
+      <td>130941.6369</td>
+      <td>82.6640</td>
+      <td>0.9643</td>
+      <td>76.9805</td>
+      <td>2.3000</td>
+      <td>5.3021</td>
+      <td>44.3634</td>
+      <td>5505180.8900</td>
+      <td>748241.4029</td>
+      <td>33.8669</td>
+      <td>13.0328</td>
+      <td>3.3432</td>
+      <td>36.2410</td>
+      <td>63528.6343</td>
+      <td>51.1000</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>351.1</td>
-      <td>113300.60110</td>
-      <td>88.116</td>
-      <td>0.291641</td>
-      <td>81.602439</td>
-      <td>4.1</td>
-      <td>6.826140</td>
-      <td>65.499675</td>
-      <td>4.113555e+04</td>
-      <td>7778.773921</td>
-      <td>15.711000</td>
-      <td>4.691237</td>
-      <td>56.914456</td>
-      <td>145.785100</td>
-      <td>60915.42440</td>
-      <td>77.9</td>
+      <td>351.1000</td>
+      <td>113300.6011</td>
+      <td>88.1160</td>
+      <td>0.2916</td>
+      <td>81.6024</td>
+      <td>4.1000</td>
+      <td>6.8261</td>
+      <td>65.4997</td>
+      <td>41135.5545</td>
+      <td>7778.7739</td>
+      <td>15.7110</td>
+      <td>4.6912</td>
+      <td>56.9145</td>
+      <td>145.7851</td>
+      <td>60915.4244</td>
+      <td>77.9000</td>
     </tr>
   </tbody>
 </table>
@@ -3502,98 +3507,98 @@ cancer_rate_imputed_numeric.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>452.4</td>
-      <td>98380.63601</td>
-      <td>86.241</td>
-      <td>1.235701</td>
-      <td>83.200000</td>
-      <td>7.2</td>
-      <td>4.941054</td>
-      <td>46.252480</td>
-      <td>5.719031e+05</td>
-      <td>131484.763200</td>
-      <td>17.421315</td>
-      <td>14.772658</td>
-      <td>24.893584</td>
-      <td>3.335312</td>
-      <td>51722.06900</td>
-      <td>60.1</td>
+      <td>452.4000</td>
+      <td>98380.6360</td>
+      <td>86.2410</td>
+      <td>1.2357</td>
+      <td>83.2000</td>
+      <td>7.2000</td>
+      <td>4.9411</td>
+      <td>46.2525</td>
+      <td>571903.1199</td>
+      <td>131484.7632</td>
+      <td>17.4213</td>
+      <td>14.7727</td>
+      <td>24.8936</td>
+      <td>3.3353</td>
+      <td>51722.0690</td>
+      <td>60.1000</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>422.9</td>
-      <td>77541.76438</td>
-      <td>86.699</td>
-      <td>2.204789</td>
-      <td>82.256098</td>
-      <td>7.2</td>
-      <td>4.354730</td>
-      <td>38.562911</td>
-      <td>8.015803e+04</td>
-      <td>32241.937000</td>
-      <td>37.570126</td>
-      <td>6.160799</td>
-      <td>59.475540</td>
-      <td>19.331586</td>
-      <td>41760.59478</td>
-      <td>56.7</td>
+      <td>422.9000</td>
+      <td>77541.7644</td>
+      <td>86.6990</td>
+      <td>2.2048</td>
+      <td>82.2561</td>
+      <td>7.2000</td>
+      <td>4.3547</td>
+      <td>38.5629</td>
+      <td>80158.0258</td>
+      <td>32241.9370</td>
+      <td>37.5701</td>
+      <td>6.1608</td>
+      <td>59.4755</td>
+      <td>19.3316</td>
+      <td>41760.5948</td>
+      <td>56.7000</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>372.8</td>
-      <td>198405.87500</td>
-      <td>63.653</td>
-      <td>1.029111</td>
-      <td>82.556098</td>
-      <td>5.3</td>
-      <td>5.684596</td>
-      <td>65.495718</td>
-      <td>5.949773e+04</td>
-      <td>15252.824630</td>
-      <td>11.351720</td>
-      <td>6.768228</td>
-      <td>0.274092</td>
-      <td>72.367281</td>
-      <td>85420.19086</td>
-      <td>57.4</td>
+      <td>372.8000</td>
+      <td>198405.8750</td>
+      <td>63.6530</td>
+      <td>1.0291</td>
+      <td>82.5561</td>
+      <td>5.3000</td>
+      <td>5.6846</td>
+      <td>65.4957</td>
+      <td>59497.7347</td>
+      <td>15252.8246</td>
+      <td>11.3517</td>
+      <td>6.7682</td>
+      <td>0.2741</td>
+      <td>72.3673</td>
+      <td>85420.1909</td>
+      <td>57.4000</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>362.2</td>
-      <td>130941.63690</td>
-      <td>82.664</td>
-      <td>0.964348</td>
-      <td>76.980488</td>
-      <td>2.3</td>
-      <td>5.302060</td>
-      <td>44.363367</td>
-      <td>5.505181e+06</td>
-      <td>748241.402900</td>
-      <td>33.866926</td>
-      <td>13.032828</td>
-      <td>3.343170</td>
-      <td>36.240985</td>
-      <td>63528.63430</td>
-      <td>51.1</td>
+      <td>362.2000</td>
+      <td>130941.6369</td>
+      <td>82.6640</td>
+      <td>0.9643</td>
+      <td>76.9805</td>
+      <td>2.3000</td>
+      <td>5.3021</td>
+      <td>44.3634</td>
+      <td>5505180.8900</td>
+      <td>748241.4029</td>
+      <td>33.8669</td>
+      <td>13.0328</td>
+      <td>3.3432</td>
+      <td>36.2410</td>
+      <td>63528.6343</td>
+      <td>51.1000</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>351.1</td>
-      <td>113300.60110</td>
-      <td>88.116</td>
-      <td>0.291641</td>
-      <td>81.602439</td>
-      <td>4.1</td>
-      <td>6.826140</td>
-      <td>65.499675</td>
-      <td>4.113555e+04</td>
-      <td>7778.773921</td>
-      <td>15.711000</td>
-      <td>4.691237</td>
-      <td>56.914456</td>
-      <td>145.785100</td>
-      <td>60915.42440</td>
-      <td>77.9</td>
+      <td>351.1000</td>
+      <td>113300.6011</td>
+      <td>88.1160</td>
+      <td>0.2916</td>
+      <td>81.6024</td>
+      <td>4.1000</td>
+      <td>6.8261</td>
+      <td>65.4997</td>
+      <td>41135.5545</td>
+      <td>7778.7739</td>
+      <td>15.7110</td>
+      <td>4.6912</td>
+      <td>56.9145</td>
+      <td>145.7851</td>
+      <td>60915.4244</td>
+      <td>77.9000</td>
     </tr>
   </tbody>
 </table>
@@ -3733,7 +3738,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>1</th>
@@ -3742,7 +3747,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>2</th>
@@ -3751,7 +3756,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>3</th>
@@ -3760,7 +3765,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>4</th>
@@ -3769,7 +3774,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>5</th>
@@ -3778,7 +3783,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>6</th>
@@ -3787,7 +3792,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>7</th>
@@ -3796,7 +3801,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>8</th>
@@ -3805,7 +3810,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>9</th>
@@ -3814,7 +3819,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>10</th>
@@ -3823,7 +3828,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>11</th>
@@ -3832,7 +3837,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>12</th>
@@ -3841,7 +3846,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>13</th>
@@ -3850,7 +3855,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>14</th>
@@ -3859,7 +3864,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>15</th>
@@ -3868,7 +3873,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>16</th>
@@ -3877,7 +3882,7 @@ display(imputed_column_quality_summary)
       <td>163</td>
       <td>163</td>
       <td>0</td>
-      <td>1.0</td>
+      <td>1.0000</td>
     </tr>
   </tbody>
 </table>
@@ -4009,130 +4014,130 @@ display(numeric_column_outlier_summary)
     <tr>
       <th>0</th>
       <td>CANRAT</td>
-      <td>0.910128</td>
+      <td>0.9101</td>
       <td>2</td>
       <td>163</td>
-      <td>0.012270</td>
+      <td>0.0123</td>
     </tr>
     <tr>
       <th>1</th>
       <td>GDPPER</td>
-      <td>1.554434</td>
+      <td>1.5544</td>
       <td>3</td>
       <td>163</td>
-      <td>0.018405</td>
+      <td>0.0184</td>
     </tr>
     <tr>
       <th>2</th>
       <td>URBPOP</td>
-      <td>-0.212327</td>
+      <td>-0.2123</td>
       <td>0</td>
       <td>163</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>3</th>
       <td>POPGRO</td>
-      <td>-0.181666</td>
+      <td>-0.1817</td>
       <td>0</td>
       <td>163</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>4</th>
       <td>LIFEXP</td>
-      <td>-0.329704</td>
+      <td>-0.3297</td>
       <td>0</td>
       <td>163</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>5</th>
       <td>TUBINC</td>
-      <td>1.747962</td>
+      <td>1.7480</td>
       <td>12</td>
       <td>163</td>
-      <td>0.073620</td>
+      <td>0.0736</td>
     </tr>
     <tr>
       <th>6</th>
       <td>DTHCMD</td>
-      <td>0.930709</td>
+      <td>0.9307</td>
       <td>0</td>
       <td>163</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>7</th>
       <td>AGRLND</td>
-      <td>0.035315</td>
+      <td>0.0353</td>
       <td>0</td>
       <td>163</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>8</th>
       <td>GHGEMI</td>
-      <td>9.299960</td>
+      <td>9.3000</td>
       <td>27</td>
       <td>163</td>
-      <td>0.165644</td>
+      <td>0.1656</td>
     </tr>
     <tr>
       <th>9</th>
       <td>METEMI</td>
-      <td>5.688689</td>
+      <td>5.6887</td>
       <td>20</td>
       <td>163</td>
-      <td>0.122699</td>
+      <td>0.1227</td>
     </tr>
     <tr>
       <th>10</th>
       <td>FORARE</td>
-      <td>0.556183</td>
+      <td>0.5562</td>
       <td>0</td>
       <td>163</td>
-      <td>0.000000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>11</th>
       <td>CO2EMI</td>
-      <td>2.693585</td>
+      <td>2.6936</td>
       <td>11</td>
       <td>163</td>
-      <td>0.067485</td>
+      <td>0.0675</td>
     </tr>
     <tr>
       <th>12</th>
       <td>PM2EXP</td>
-      <td>-3.061617</td>
+      <td>-3.0616</td>
       <td>37</td>
       <td>163</td>
-      <td>0.226994</td>
+      <td>0.2270</td>
     </tr>
     <tr>
       <th>13</th>
       <td>POPDEN</td>
-      <td>9.972806</td>
+      <td>9.9728</td>
       <td>20</td>
       <td>163</td>
-      <td>0.122699</td>
+      <td>0.1227</td>
     </tr>
     <tr>
       <th>14</th>
       <td>GDPCAP</td>
-      <td>2.311079</td>
+      <td>2.3111</td>
       <td>22</td>
       <td>163</td>
-      <td>0.134969</td>
+      <td>0.1350</td>
     </tr>
     <tr>
       <th>15</th>
       <td>EPISCO</td>
-      <td>0.635994</td>
+      <td>0.6360</td>
       <td>3</td>
       <td>163</td>
-      <td>0.018405</td>
+      <td>0.0184</td>
     </tr>
   </tbody>
 </table>
@@ -4152,97 +4157,97 @@ for column in cancer_rate_imputed_numeric:
 
 
     
-![png](output_122_0.png)
+![png](output_123_0.png)
     
 
 
 
     
-![png](output_122_1.png)
+![png](output_123_1.png)
     
 
 
 
     
-![png](output_122_2.png)
+![png](output_123_2.png)
     
 
 
 
     
-![png](output_122_3.png)
+![png](output_123_3.png)
     
 
 
 
     
-![png](output_122_4.png)
+![png](output_123_4.png)
     
 
 
 
     
-![png](output_122_5.png)
+![png](output_123_5.png)
     
 
 
 
     
-![png](output_122_6.png)
+![png](output_123_6.png)
     
 
 
 
     
-![png](output_122_7.png)
+![png](output_123_7.png)
     
 
 
 
     
-![png](output_122_8.png)
+![png](output_123_8.png)
     
 
 
 
     
-![png](output_122_9.png)
+![png](output_123_9.png)
     
 
 
 
     
-![png](output_122_10.png)
+![png](output_123_10.png)
     
 
 
 
     
-![png](output_122_11.png)
+![png](output_123_11.png)
     
 
 
 
     
-![png](output_122_12.png)
+![png](output_123_12.png)
     
 
 
 
     
-![png](output_122_13.png)
+![png](output_123_13.png)
     
 
 
 
     
-![png](output_122_14.png)
+![png](output_123_14.png)
     
 
 
 
     
-![png](output_122_15.png)
+![png](output_123_15.png)
     
 
 
@@ -4354,103 +4359,103 @@ display(cancer_rate_imputed_numeric_summary.sort_values(by=['Pearson.Correlation
   <tbody>
     <tr>
       <th>GDPPER_GDPCAP</th>
-      <td>0.921009</td>
-      <td>8.173822e-68</td>
+      <td>0.9210</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>GHGEMI_METEMI</th>
-      <td>0.905121</td>
-      <td>1.087643e-61</td>
+      <td>0.9051</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>POPGRO_DTHCMD</th>
-      <td>0.759470</td>
-      <td>7.124695e-32</td>
+      <td>0.7595</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>GDPPER_LIFEXP</th>
-      <td>0.755792</td>
-      <td>2.052275e-31</td>
+      <td>0.7558</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_EPISCO</th>
-      <td>0.712599</td>
-      <td>1.445594e-26</td>
+      <td>0.7126</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_GDPCAP</th>
-      <td>0.696991</td>
-      <td>4.991271e-25</td>
+      <td>0.6970</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>GDPCAP_EPISCO</th>
-      <td>0.696707</td>
-      <td>5.312642e-25</td>
+      <td>0.6967</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_LIFEXP</th>
-      <td>0.692318</td>
-      <td>1.379448e-24</td>
+      <td>0.6923</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_GDPPER</th>
-      <td>0.686787</td>
-      <td>4.483016e-24</td>
+      <td>0.6868</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>LIFEXP_GDPCAP</th>
-      <td>0.683834</td>
-      <td>8.321371e-24</td>
+      <td>0.6838</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>GDPPER_EPISCO</th>
-      <td>0.680814</td>
-      <td>1.554608e-23</td>
+      <td>0.6808</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>GDPPER_URBPOP</th>
-      <td>0.666399</td>
-      <td>2.778872e-22</td>
+      <td>0.6664</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>GDPPER_CO2EMI</th>
-      <td>0.654956</td>
-      <td>2.451320e-21</td>
+      <td>0.6550</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>TUBINC_DTHCMD</th>
-      <td>0.643615</td>
-      <td>1.936081e-20</td>
+      <td>0.6436</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>URBPOP_LIFEXP</th>
-      <td>0.623997</td>
-      <td>5.669778e-19</td>
+      <td>0.6240</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>LIFEXP_EPISCO</th>
-      <td>0.620271</td>
-      <td>1.048393e-18</td>
+      <td>0.6203</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>URBPOP_GDPCAP</th>
-      <td>0.559181</td>
-      <td>8.624533e-15</td>
+      <td>0.5592</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CO2EMI_GDPCAP</th>
-      <td>0.550221</td>
-      <td>2.782997e-14</td>
+      <td>0.5502</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>URBPOP_CO2EMI</th>
-      <td>0.550046</td>
-      <td>2.846393e-14</td>
+      <td>0.5500</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>LIFEXP_CO2EMI</th>
-      <td>0.531305</td>
-      <td>2.951829e-13</td>
+      <td>0.5313</td>
+      <td>0.0000</td>
     </tr>
   </tbody>
 </table>
@@ -4472,7 +4477,7 @@ plt.show()
 
 
     
-![png](output_127_0.png)
+![png](output_128_0.png)
     
 
 
@@ -4509,7 +4514,7 @@ plot_correlation_matrix(cancer_rate_imputed_numeric_correlation,mask)
 
 
     
-![png](output_129_0.png)
+![png](output_130_0.png)
     
 
 
@@ -4604,85 +4609,85 @@ for column in cancer_rate_transformed_numeric:
 
 
     
-![png](output_135_0.png)
+![png](output_136_0.png)
     
 
 
 
     
-![png](output_135_1.png)
+![png](output_136_1.png)
     
 
 
 
     
-![png](output_135_2.png)
+![png](output_136_2.png)
     
 
 
 
     
-![png](output_135_3.png)
+![png](output_136_3.png)
     
 
 
 
     
-![png](output_135_4.png)
+![png](output_136_4.png)
     
 
 
 
     
-![png](output_135_5.png)
+![png](output_136_5.png)
     
 
 
 
     
-![png](output_135_6.png)
+![png](output_136_6.png)
     
 
 
 
     
-![png](output_135_7.png)
+![png](output_136_7.png)
     
 
 
 
     
-![png](output_135_8.png)
+![png](output_136_8.png)
     
 
 
 
     
-![png](output_135_9.png)
+![png](output_136_9.png)
     
 
 
 
     
-![png](output_135_10.png)
+![png](output_136_10.png)
     
 
 
 
     
-![png](output_135_11.png)
+![png](output_136_11.png)
     
 
 
 
     
-![png](output_135_12.png)
+![png](output_136_12.png)
     
 
 
 
     
-![png](output_135_13.png)
+![png](output_136_13.png)
     
 
 
@@ -4772,79 +4777,79 @@ for column in cancer_rate_scaled_numeric:
 
 
     
-![png](output_141_0.png)
+![png](output_142_0.png)
     
 
 
 
     
-![png](output_141_1.png)
+![png](output_142_1.png)
     
 
 
 
     
-![png](output_141_2.png)
+![png](output_142_2.png)
     
 
 
 
     
-![png](output_141_3.png)
+![png](output_142_3.png)
     
 
 
 
     
-![png](output_141_4.png)
+![png](output_142_4.png)
     
 
 
 
     
-![png](output_141_5.png)
+![png](output_142_5.png)
     
 
 
 
     
-![png](output_141_6.png)
+![png](output_142_6.png)
     
 
 
 
     
-![png](output_141_7.png)
+![png](output_142_7.png)
     
 
 
 
     
-![png](output_141_8.png)
+![png](output_142_8.png)
     
 
 
 
     
-![png](output_141_9.png)
+![png](output_142_9.png)
     
 
 
 
     
-![png](output_141_10.png)
+![png](output_142_10.png)
     
 
 
 
     
-![png](output_141_11.png)
+![png](output_142_11.png)
     
 
 
 
     
-![png](output_141_12.png)
+![png](output_142_12.png)
     
 
 
@@ -5020,7 +5025,7 @@ plt.show()
 
 
     
-![png](output_153_0.png)
+![png](output_154_0.png)
     
 
 
@@ -5103,68 +5108,68 @@ display(cancer_rate_preprocessed_numeric_summary.sort_values(by=['Correlation.PV
   <tbody>
     <tr>
       <th>CANRAT_CANRAT</th>
-      <td>1.000000</td>
-      <td>0.000000e+00</td>
+      <td>1.0000</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_GDPCAP</th>
-      <td>0.735131</td>
-      <td>5.617239e-29</td>
+      <td>0.7351</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_LIFEXP</th>
-      <td>0.702430</td>
-      <td>1.491302e-25</td>
+      <td>0.7024</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_DTHCMD</th>
-      <td>-0.687136</td>
-      <td>4.164564e-24</td>
+      <td>-0.6871</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_EPISCO</th>
-      <td>0.648431</td>
-      <td>8.136735e-21</td>
+      <td>0.6484</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_TUBINC</th>
-      <td>-0.628877</td>
-      <td>2.503346e-19</td>
+      <td>-0.6289</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_CO2EMI</th>
-      <td>0.585452</td>
-      <td>2.251585e-16</td>
+      <td>0.5855</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_POPGRO</th>
-      <td>-0.498457</td>
-      <td>1.278437e-11</td>
+      <td>-0.4985</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_URBPOP</th>
-      <td>0.479386</td>
-      <td>9.543704e-11</td>
+      <td>0.4794</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_GHGEMI</th>
-      <td>0.232488</td>
-      <td>2.822914e-03</td>
+      <td>0.2325</td>
+      <td>0.0028</td>
     </tr>
     <tr>
       <th>CANRAT_FORARE</th>
-      <td>0.165265</td>
-      <td>3.500992e-02</td>
+      <td>0.1653</td>
+      <td>0.0350</td>
     </tr>
     <tr>
       <th>CANRAT_AGRLND</th>
-      <td>-0.024520</td>
-      <td>7.560347e-01</td>
+      <td>-0.0245</td>
+      <td>0.7560</td>
     </tr>
     <tr>
       <th>CANRAT_POPDEN</th>
-      <td>0.001902</td>
-      <td>9.807807e-01</td>
+      <td>0.0019</td>
+      <td>0.9808</td>
     </tr>
   </tbody>
 </table>
@@ -5229,23 +5234,23 @@ display(cancer_rate_preprocessed_categorical_summary.sort_values(by=['T.Test.PVa
   <tbody>
     <tr>
       <th>CANRAT_HDICAT_VH</th>
-      <td>-10.605706</td>
-      <td>2.909971e-20</td>
+      <td>-10.6057</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_HDICAT_L</th>
-      <td>6.559780</td>
-      <td>7.003957e-10</td>
+      <td>6.5598</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_HDICAT_M</th>
-      <td>5.104986</td>
-      <td>9.237518e-07</td>
+      <td>5.1050</td>
+      <td>0.0000</td>
     </tr>
     <tr>
       <th>CANRAT_HDICAT_H</th>
-      <td>-0.635957</td>
-      <td>5.257075e-01</td>
+      <td>-0.6360</td>
+      <td>0.5257</td>
     </tr>
   </tbody>
 </table>
@@ -5256,6 +5261,16 @@ display(cancer_rate_preprocessed_categorical_summary.sort_values(by=['T.Test.PVa
 
 ### 1.6.1 Premodelling Data Description <a class="anchor" id="1.6.1"></a>
 
+1. Among the 10 numeric variables determined to have a statistically significant linear relationship between the <span style="color: #FF0000">CANRAT</span> target variable, only 6 were retained with absolute Pearson correlation coefficient values greater than 0.50. 
+    * <span style="color: #FF0000">GDPCAP</span>: Pearson.Correlation.Coefficient=+0.735, Correlation.PValue=0.000
+    * <span style="color: #FF0000">LIFEXP</span>: Pearson.Correlation.Coefficient=+0.702, Correlation.PValue=0.000   
+    * <span style="color: #FF0000">DTHCMD</span>: Pearson.Correlation.Coefficient=-0.687, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">EPISCO</span>: Pearson.Correlation.Coefficient=+0.648, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">TUBINC</span>: Pearson.Correlation.Coefficient=+0.628, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: Pearson.Correlation.Coefficient=+0.585, Correlation.PValue=0.000  
+2. Among the 4 4 categorical predictors determined to have a a statistically significant difference between the means of <span style="color: #FF0000">CANRAT</span> measuremens obtained from groups 0 and 1, only 1 was retained with absolute T-Test statistics greater than 10.
+    * <span style="color: #FF0000">HDICAT_VH</span>: T.Test.Statistic=-10.605, T.Test.PValue=0.000
+
 
 ```python
 ##################################
@@ -5263,7 +5278,7 @@ display(cancer_rate_preprocessed_categorical_summary.sort_values(by=['T.Test.PVa
 # and encoded categorical columns
 # after hypothesis testing
 ##################################
-cancer_rate_premodelling = cancer_rate_preprocessed.drop(['AGRLND','POPDEN','GHGEMI','FORARE','POPGRO','URBPOP','HDICAT_H','HDICAT_M','HDICAT_L'], axis=1) 
+cancer_rate_premodelling = cancer_rate_preprocessed.drop(['AGRLND','POPDEN','GHGEMI','FORARE','POPGRO','URBPOP','HDICAT_H','HDICAT_M','HDICAT_L'], axis=1)
 ```
 
 
@@ -5348,57 +5363,57 @@ cancer_rate_premodelling.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>2.076468</td>
-      <td>1.643195</td>
-      <td>-1.102296</td>
-      <td>-0.971464</td>
-      <td>1.736841</td>
-      <td>1.549766</td>
-      <td>1.306738</td>
+      <td>2.0765</td>
+      <td>1.6432</td>
+      <td>-1.1023</td>
+      <td>-0.9715</td>
+      <td>1.7368</td>
+      <td>1.5498</td>
+      <td>1.3067</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1.962991</td>
-      <td>1.487969</td>
-      <td>-1.102296</td>
-      <td>-1.091413</td>
-      <td>0.943507</td>
-      <td>1.407752</td>
-      <td>1.102912</td>
+      <td>1.9630</td>
+      <td>1.4880</td>
+      <td>-1.1023</td>
+      <td>-1.0914</td>
+      <td>0.9435</td>
+      <td>1.4078</td>
+      <td>1.1029</td>
       <td>1</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>1.742760</td>
-      <td>1.537044</td>
-      <td>-1.275298</td>
-      <td>-0.836295</td>
-      <td>1.031680</td>
-      <td>1.879374</td>
-      <td>1.145832</td>
+      <td>1.7428</td>
+      <td>1.5370</td>
+      <td>-1.2753</td>
+      <td>-0.8363</td>
+      <td>1.0317</td>
+      <td>1.8794</td>
+      <td>1.1458</td>
       <td>1</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>1.690866</td>
-      <td>0.664178</td>
-      <td>-1.696341</td>
-      <td>-0.903718</td>
-      <td>1.627748</td>
-      <td>1.685426</td>
-      <td>0.739753</td>
+      <td>1.6909</td>
+      <td>0.6642</td>
+      <td>-1.6963</td>
+      <td>-0.9037</td>
+      <td>1.6277</td>
+      <td>1.6854</td>
+      <td>0.7398</td>
       <td>1</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>1.634224</td>
-      <td>1.381877</td>
-      <td>-1.413414</td>
-      <td>-0.657145</td>
-      <td>0.686270</td>
-      <td>1.657777</td>
-      <td>2.218327</td>
+      <td>1.6342</td>
+      <td>1.3819</td>
+      <td>-1.4134</td>
+      <td>-0.6571</td>
+      <td>0.6863</td>
+      <td>1.6578</td>
+      <td>2.2183</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -5418,7 +5433,7 @@ plt.show()
 
 
     
-![png](output_165_0.png)
+![png](output_166_0.png)
     
 
 
@@ -5519,6 +5534,22 @@ def rmse_l1_ratio_plot(model_type):
 
 ### 1.6.2 Linear Regression <a class="anchor" id="1.6.2"></a>
 
+[Linear Regression](https://link.springer.com/book/10.1007/978-1-4757-3462-1) explores the linear relationship between a scalar response and one or more covariates by having the conditional mean of the dependent variable be an affine function of the independent variables. The relationship is modeled through a disturbance term which represents an unobserved random variable that adds noise. The algorithm is typically formulated from the data using the least squares method which seeks to estimate the coefficients by minimizing the squared residual function. The linear equation assigns one scale factor represented by a coefficient to each covariate and an additional coefficient called the intercept or the bias coefficient which gives the line an additional degree of freedom allowing to move up and down a two-dimensional plot.
+
+1. The [linear regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 1 hyperparameter:
+    * <span style="color: #FF0000">degree</span> = degree held constant at a value of 1
+3. No hyperparameter tuning was conducted. 
+4. The apparent model performance of the optimal model is summarized as follows:
+    * **R-Squared** = 0.6332
+    * **Mean Squared Error** = 0.3550
+    * **Mean Absolute Error** = 0.4609
+5. The independent test model performance of the final model is summarized as follows:
+    * **R-Squared** = 0.6446
+    * **Mean Squared Error** = 0.3716
+    * **Mean Absolute Error** = 0.4773
+6. Apparent and independent test model performance are relatively comparable, indicative of the absence of model overfitting.
+
 
 ```python
 ##################################
@@ -5548,7 +5579,7 @@ linear_regression_pipeline.fit(X_train, y_train)
 
 ```python
 ##################################
-# Evaluating the polynomial regression model
+# Evaluating the linear regression model
 # on the train set
 ##################################
 linear_y_hat_train = linear_regression_pipeline.predict(X_train)
@@ -5595,21 +5626,21 @@ display(linear_performance_train)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.633225</td>
+      <td>0.6332</td>
       <td>linear_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.354963</td>
+      <td>0.3550</td>
       <td>linear_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.460899</td>
+      <td>0.4609</td>
       <td>linear_regression</td>
       <td>train</td>
     </tr>
@@ -5621,7 +5652,7 @@ display(linear_performance_train)
 
 ```python
 ##################################
-# Evaluating the polynomial regression model
+# Evaluating the linear regression model
 # on the test set
 ##################################
 linear_y_hat_test = linear_regression_pipeline.predict(X_test)
@@ -5668,21 +5699,21 @@ display(linear_performance_test)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.644619</td>
+      <td>0.6446</td>
       <td>linear_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.371621</td>
+      <td>0.3716</td>
       <td>linear_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.477317</td>
+      <td>0.4773</td>
       <td>linear_regression</td>
       <td>test</td>
     </tr>
@@ -5699,6 +5730,7 @@ display(linear_performance_test)
 ##################################
 figure = plt.figure(figsize=(10,6))
 axes = plt.axes()
+plt.grid(True)
 axes.plot(y_test, 
           linear_y_hat_test, 
           marker='o', 
@@ -5714,11 +5746,27 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_175_0.png)
+![png](output_176_0.png)
     
 
 
 ### 1.6.3 Polynomial Regression <a class="anchor" id="1.6.3"></a>
+
+[Polynomial Regression](https://link.springer.com/book/10.1007/978-1-4757-3462-1) explores the relationship between one or more covariates and a scalar response which is modelled as an nth degree polynomial of the covariates. The algorithm fits a nonlinear relationship between the value of the independent variables and the corresponding conditional mean of the dependent variable. Although polynomial regression fits a nonlinear model to the data, as a statistical estimation problem it is linear, in the sense that the regression function is linear in the unknown parameters that are estimated from the data. For this reason, polynomial regression is considered to be a special case of multiple linear regression.
+
+1. The [polynomial regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 1 hyperparameter:
+    * <span style="color: #FF0000">degree</span> = degree held constant at a value of 2
+3. No hyperparameter tuning was conducted. 
+4. The apparent model performance of the optimal model is summarized as follows:
+    * **R-Squared** = 0.7908
+    * **Mean Squared Error** = 0.2024
+    * **Mean Absolute Error** = 0.3503
+5. The independent test model performance of the final model is summarized as follows:
+    * **R-Squared** = 0.6324
+    * **Mean Squared Error** = 0.3844
+    * **Mean Absolute Error** = 0.4867
+6. Apparent and independent test model performance are relatively different, indicative of the presence of model overfitting.
 
 
 ```python
@@ -5794,21 +5842,21 @@ display(polynomial_performance_train)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.790822</td>
+      <td>0.7908</td>
       <td>polynomial_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.202441</td>
+      <td>0.2024</td>
       <td>polynomial_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.350251</td>
+      <td>0.3503</td>
       <td>polynomial_regression</td>
       <td>train</td>
     </tr>
@@ -5867,21 +5915,21 @@ display(polynomial_performance_test)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.632381</td>
+      <td>0.6324</td>
       <td>polynomial_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.384419</td>
+      <td>0.3844</td>
       <td>polynomial_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.486662</td>
+      <td>0.4867</td>
       <td>polynomial_regression</td>
       <td>test</td>
     </tr>
@@ -5898,6 +5946,7 @@ display(polynomial_performance_test)
 ##################################
 figure = plt.figure(figsize=(10,6))
 axes = plt.axes()
+plt.grid(True)
 axes.plot(y_test, 
           polynomial_y_hat_test, 
           marker='o', 
@@ -5913,11 +5962,28 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_180_0.png)
+![png](output_181_0.png)
     
 
 
 ### 1.6.4 Ridge Regression <a class="anchor" id="1.6.4"></a>
+
+[Ridge Regression](https://www.tandfonline.com/doi/abs/10.1080/00401706.1970.10488634) is a regression technique aimed at preventing overfitting in linear regression models when the model is too complex and fits the training data very closely, but performs poorly on new and unseen data. The algorithm adds a penalty term (referred to as the L2 regularization) to the linear regression cost function that is proportional to the square of the magnitude of the coefficients. This approach helps to reduce the magnitude of the coefficients in the model, which in turn can prevent overfitting and is especially helpful where there are many correlated predictor variables in the model. A hyperparameter alpha serving as a constant that multiplies the L2 term thereby controlling regularization strength needs to be optimized through cross-validation.
+
+1. The [ridge regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 1 hyperparameter:
+    * <span style="color: #FF0000">alpha</span> = alpha made to vary across a range of values equal to 0.0001 to 1000
+3. Hyperparameter tuning was conducted using the leave-one-out-cross-validation method with optimal model performance determined for: 
+    * <span style="color: #FF0000">alpha</span> = 10
+4. The apparent model performance of the optimal model is summarized as follows:
+    * **R-Squared** = 0.6220
+    * **Mean Squared Error** = 0.3659
+    * **Mean Absolute Error** = 0.4680
+5. The independent test model performance of the final model is summarized as follows:
+    * **R-Squared** = 0.6352
+    * **Mean Squared Error** = 0.3815
+    * **Mean Absolute Error** = 0.4838
+6. Apparent and independent test model performance are relatively comparable, indicative of the absence of model overfitting.
 
 
 ```python
@@ -5925,7 +5991,14 @@ axes.set(xlabel='Actual Cancer Rate',
 # Defining the hyperparameters
 # for the ridge regression model
 ##################################
-alphas = [0.00001,0.0001,0.001,0.01,0.1,1,10,100]
+alphas = [0.0001,0.001,0.01,0.1,1,10,100,1000]
+
+##################################
+# Formulating a string equivalent 
+# of the alpha hyperparameter list
+##################################
+alphas_string = map(str, alphas)
+alphas_string = list(alphas_string)
 
 ##################################
 # Defining a pipeline for the 
@@ -5946,12 +6019,12 @@ ridge_regression_pipeline.fit(X_train, y_train)
 <style>#sk-container-id-3 {color: black;}#sk-container-id-3 pre{padding: 0;}#sk-container-id-3 div.sk-toggleable {background-color: white;}#sk-container-id-3 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-3 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-3 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-3 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-3 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-3 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-3 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-3 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-3 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-3 div.sk-item {position: relative;z-index: 1;}#sk-container-id-3 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-3 div.sk-item::before, #sk-container-id-3 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-3 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-3 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-3 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-3 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-3 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-3 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-3 div.sk-label-container {text-align: center;}#sk-container-id-3 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-3 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;polynomial_features&#x27;,
                  PolynomialFeatures(degree=1, include_bias=False)),
                 (&#x27;ridge_regression&#x27;,
-                 RidgeCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+                 RidgeCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
                          store_cv_values=True))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-7" type="checkbox" ><label for="sk-estimator-id-7" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;polynomial_features&#x27;,
                  PolynomialFeatures(degree=1, include_bias=False)),
                 (&#x27;ridge_regression&#x27;,
-                 RidgeCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
-                         store_cv_values=True))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-8" type="checkbox" ><label for="sk-estimator-id-8" class="sk-toggleable__label sk-toggleable__label-arrow">PolynomialFeatures</label><div class="sk-toggleable__content"><pre>PolynomialFeatures(degree=1, include_bias=False)</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-9" type="checkbox" ><label for="sk-estimator-id-9" class="sk-toggleable__label sk-toggleable__label-arrow">RidgeCV</label><div class="sk-toggleable__content"><pre>RidgeCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+                 RidgeCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
+                         store_cv_values=True))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-8" type="checkbox" ><label for="sk-estimator-id-8" class="sk-toggleable__label sk-toggleable__label-arrow">PolynomialFeatures</label><div class="sk-toggleable__content"><pre>PolynomialFeatures(degree=1, include_bias=False)</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-9" type="checkbox" ><label for="sk-estimator-id-9" class="sk-toggleable__label sk-toggleable__label-arrow">RidgeCV</label><div class="sk-toggleable__content"><pre>RidgeCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
         store_cv_values=True)</pre></div></div></div></div></div></div></div>
 
 
@@ -5981,9 +6054,9 @@ ridge_regression_LOOCV = pd.DataFrame(ridge_regression_pipeline['ridge_regressio
 ridge_regression_LOOCV.index.name = 'case_index'
 ridge_regression_LOOCV.reset_index(inplace=True)
 ridge_regression_LOOCV = pd.melt(ridge_regression_LOOCV, 
-                                 id_vars=['case_index'], 
-                                 value_vars=['1e-05', '0.0001', '0.001', '0.01', '0.1', '1', '10', '100'], 
-                                 ignore_index=False)
+                                 id_vars = ['case_index'], 
+                                 value_vars = alphas_string, 
+                                 ignore_index = False)
 ridge_regression_LOOCV.rename(columns = {'variable':'alpha', 'value':'MSE'}, inplace = True)
 display(ridge_regression_LOOCV)
 ```
@@ -6016,32 +6089,32 @@ display(ridge_regression_LOOCV)
     <tr>
       <th>0</th>
       <td>0</td>
-      <td>1e-05</td>
-      <td>0.001156</td>
+      <td>0.0001</td>
+      <td>0.0012</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>1e-05</td>
-      <td>0.005790</td>
+      <td>0.0001</td>
+      <td>0.0058</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>1e-05</td>
-      <td>0.087208</td>
+      <td>0.0001</td>
+      <td>0.0872</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>1e-05</td>
-      <td>0.347302</td>
+      <td>0.0001</td>
+      <td>0.3473</td>
     </tr>
     <tr>
       <th>4</th>
       <td>4</td>
-      <td>1e-05</td>
-      <td>0.175527</td>
+      <td>0.0001</td>
+      <td>0.1755</td>
     </tr>
     <tr>
       <th>...</th>
@@ -6052,32 +6125,32 @@ display(ridge_regression_LOOCV)
     <tr>
       <th>109</th>
       <td>109</td>
-      <td>100</td>
-      <td>0.098301</td>
+      <td>1000</td>
+      <td>0.1383</td>
     </tr>
     <tr>
       <th>110</th>
       <td>110</td>
-      <td>100</td>
-      <td>0.049364</td>
+      <td>1000</td>
+      <td>0.5213</td>
     </tr>
     <tr>
       <th>111</th>
       <td>111</td>
-      <td>100</td>
-      <td>2.719617</td>
+      <td>1000</td>
+      <td>1.7320</td>
     </tr>
     <tr>
       <th>112</th>
       <td>112</td>
-      <td>100</td>
-      <td>0.125830</td>
+      <td>1000</td>
+      <td>0.0289</td>
     </tr>
     <tr>
       <th>113</th>
       <td>113</td>
-      <td>100</td>
-      <td>0.206558</td>
+      <td>1000</td>
+      <td>0.0201</td>
     </tr>
   </tbody>
 </table>
@@ -6094,7 +6167,16 @@ display(ridge_regression_LOOCV)
 ##################################
 sns.set(style="whitegrid")
 plt.figure(figsize=(10, 6))
-sns.boxplot(x='alpha', y='MSE', data=ridge_regression_LOOCV, color="#0070C0")
+plt.grid(True)
+sns.boxplot(x='alpha', 
+            y='MSE', 
+            data=ridge_regression_LOOCV, 
+            color="#0070C0",
+            showmeans=True,
+            meanprops={'marker':'o',
+                       'markerfacecolor':'#ADD8E6', 
+                       'markeredgecolor':'#FF0000',
+                       'markersize':'8'})
 plt.xlabel('Alpha Hyperparameter')
 plt.ylabel('Mean Squared Error')
 plt.title('Ridge Regression Hyperparameter Tuning Using LOOCV')
@@ -6103,7 +6185,7 @@ plt.show()
 
 
     
-![png](output_185_0.png)
+![png](output_186_0.png)
     
 
 
@@ -6157,21 +6239,21 @@ display(ridge_performance_train)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.621954</td>
+      <td>0.6220</td>
       <td>ridge_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.365871</td>
+      <td>0.3659</td>
       <td>ridge_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.467997</td>
+      <td>0.4680</td>
       <td>ridge_regression</td>
       <td>train</td>
     </tr>
@@ -6230,21 +6312,21 @@ display(ridge_performance_test)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.635183</td>
+      <td>0.6352</td>
       <td>ridge_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.381488</td>
+      <td>0.3815</td>
       <td>ridge_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.483822</td>
+      <td>0.4838</td>
       <td>ridge_regression</td>
       <td>test</td>
     </tr>
@@ -6261,6 +6343,7 @@ display(ridge_performance_test)
 ##################################
 figure = plt.figure(figsize=(10,6))
 axes = plt.axes()
+plt.grid(True)
 axes.plot(y_test, 
           ridge_y_hat_test, 
           marker='o', 
@@ -6276,11 +6359,28 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_188_0.png)
+![png](output_189_0.png)
     
 
 
 ### 1.6.5 Least Absolute Shrinkage and Selection Operator Regression <a class="anchor" id="1.6.5"></a>
+
+[Least Absolute Shrinkage and Selection Operator Regression](https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.2517-6161.1996.tb02080.x) is a regression technique aimed at preventing overfitting in linear regression models when the model is too complex and fits the training data very closely, but performs poorly on new and unseen data. The algorithm adds a penalty term (referred to as the L1 regularization) to the linear regression cost function that is proportional to the absolute value of the coefficients. This approach can be useful for feature selection, as it tends to shrink the coefficients of less important predictor variables to zero, which can help simplify the model and improve its interpretability. A hyperparameter alpha serving as a constant that multiplies the L1 term thereby controlling regularization strength needs to be optimized through cross-validation.
+
+1. The [lasso regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 1 hyperparameter:
+    * <span style="color: #FF0000">alpha</span> = alpha made to vary across a range of values equal to 0.0001 to 1000
+3. Hyperparameter tuning was conducted using the leave-one-out-cross-validation method with optimal model performance determined for: 
+    * <span style="color: #FF0000">alpha</span> = 0.01
+4. The apparent model performance of the optimal model is summarized as follows:
+    * **R-Squared** = 0.6295
+    * **Mean Squared Error** = 0.3586
+    * **Mean Absolute Error** = 0.4608
+5. The independent test model performance of the final model is summarized as follows:
+    * **R-Squared** = 0.6405
+    * **Mean Squared Error** = 0.3760
+    * **Mean Absolute Error** = 0.4805
+6. Apparent and independent test model performance are relatively comparable, indicative of the absence of model overfitting.
 
 
 ```python
@@ -6288,7 +6388,14 @@ axes.set(xlabel='Actual Cancer Rate',
 # Defining the hyperparameters
 # for the lasso regression model
 ##################################
-alphas = [0.00001,0.0001,0.001,0.01,0.1,1,10,100]
+alphas = [0.0001,0.001,0.01,0.1,1,10,100,1000]
+
+##################################
+# Formulating a string equivalent 
+# of the alpha hyperparameter list
+##################################
+alphas_string = map(str, alphas)
+alphas_string = list(alphas_string)
 
 ##################################
 # Defining a pipeline for the 
@@ -6309,12 +6416,12 @@ lasso_regression_pipeline.fit(X_train, y_train)
 <style>#sk-container-id-4 {color: black;}#sk-container-id-4 pre{padding: 0;}#sk-container-id-4 div.sk-toggleable {background-color: white;}#sk-container-id-4 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-4 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-4 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-4 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-4 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-4 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-4 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-4 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-4 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-4 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-4 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-4 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-4 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-4 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-4 div.sk-item {position: relative;z-index: 1;}#sk-container-id-4 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-4 div.sk-item::before, #sk-container-id-4 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-4 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-4 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-4 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-4 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-4 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-4 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-4 div.sk-label-container {text-align: center;}#sk-container-id-4 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-4 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-4" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;polynomial_features&#x27;,
                  PolynomialFeatures(degree=1, include_bias=False)),
                 (&#x27;lasso_regression&#x27;,
-                 LassoCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+                 LassoCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
                          cv=LeaveOneOut()))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-10" type="checkbox" ><label for="sk-estimator-id-10" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;polynomial_features&#x27;,
                  PolynomialFeatures(degree=1, include_bias=False)),
                 (&#x27;lasso_regression&#x27;,
-                 LassoCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
-                         cv=LeaveOneOut()))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-11" type="checkbox" ><label for="sk-estimator-id-11" class="sk-toggleable__label sk-toggleable__label-arrow">PolynomialFeatures</label><div class="sk-toggleable__content"><pre>PolynomialFeatures(degree=1, include_bias=False)</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-12" type="checkbox" ><label for="sk-estimator-id-12" class="sk-toggleable__label sk-toggleable__label-arrow">LassoCV</label><div class="sk-toggleable__content"><pre>LassoCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100], cv=LeaveOneOut())</pre></div></div></div></div></div></div></div>
+                 LassoCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
+                         cv=LeaveOneOut()))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-11" type="checkbox" ><label for="sk-estimator-id-11" class="sk-toggleable__label sk-toggleable__label-arrow">PolynomialFeatures</label><div class="sk-toggleable__content"><pre>PolynomialFeatures(degree=1, include_bias=False)</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-12" type="checkbox" ><label for="sk-estimator-id-12" class="sk-toggleable__label sk-toggleable__label-arrow">LassoCV</label><div class="sk-toggleable__content"><pre>LassoCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000], cv=LeaveOneOut())</pre></div></div></div></div></div></div></div>
 
 
 
@@ -6367,7 +6474,6 @@ display(lasso_regression_LOOCV)
     <tr style="text-align: right;">
       <th></th>
       <th>case_index</th>
-      <th>1e-05</th>
       <th>0.0001</th>
       <th>0.001</th>
       <th>0.01</th>
@@ -6375,68 +6481,69 @@ display(lasso_regression_LOOCV)
       <th>1</th>
       <th>10</th>
       <th>100</th>
+      <th>1000</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>0</td>
-      <td>0.001151</td>
-      <td>0.001104</td>
-      <td>0.000689</td>
-      <td>0.000929</td>
-      <td>2.659411e-07</td>
-      <td>0.001986</td>
-      <td>0.001986</td>
-      <td>0.001986</td>
+      <td>0.0011</td>
+      <td>0.0007</td>
+      <td>0.0009</td>
+      <td>0.0000</td>
+      <td>0.0020</td>
+      <td>0.0020</td>
+      <td>0.0020</td>
+      <td>0.0020</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>0.005789</td>
-      <td>0.005784</td>
-      <td>0.005734</td>
-      <td>0.005319</td>
-      <td>7.352730e-03</td>
-      <td>1.521063</td>
-      <td>1.521063</td>
-      <td>1.521063</td>
+      <td>0.0058</td>
+      <td>0.0057</td>
+      <td>0.0053</td>
+      <td>0.0074</td>
+      <td>1.5211</td>
+      <td>1.5211</td>
+      <td>1.5211</td>
+      <td>1.5211</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>0.087208</td>
-      <td>0.087209</td>
-      <td>0.087216</td>
-      <td>0.089447</td>
-      <td>2.171291e-01</td>
-      <td>1.532790</td>
-      <td>1.532790</td>
-      <td>1.532790</td>
+      <td>0.0872</td>
+      <td>0.0872</td>
+      <td>0.0894</td>
+      <td>0.2171</td>
+      <td>1.5328</td>
+      <td>1.5328</td>
+      <td>1.5328</td>
+      <td>1.5328</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>0.347277</td>
-      <td>0.347043</td>
-      <td>0.345189</td>
-      <td>0.391927</td>
-      <td>3.913336e-01</td>
-      <td>0.193144</td>
-      <td>0.193144</td>
-      <td>0.193144</td>
+      <td>0.3470</td>
+      <td>0.3452</td>
+      <td>0.3919</td>
+      <td>0.3913</td>
+      <td>0.1931</td>
+      <td>0.1931</td>
+      <td>0.1931</td>
+      <td>0.1931</td>
     </tr>
     <tr>
       <th>4</th>
       <td>4</td>
-      <td>0.175571</td>
-      <td>0.175974</td>
-      <td>0.180023</td>
-      <td>0.224976</td>
-      <td>5.213217e-01</td>
-      <td>2.301457</td>
-      <td>2.301457</td>
-      <td>2.301457</td>
+      <td>0.1760</td>
+      <td>0.1800</td>
+      <td>0.2250</td>
+      <td>0.5213</td>
+      <td>2.3015</td>
+      <td>2.3015</td>
+      <td>2.3015</td>
+      <td>2.3015</td>
     </tr>
     <tr>
       <th>...</th>
@@ -6453,62 +6560,62 @@ display(lasso_regression_LOOCV)
     <tr>
       <th>109</th>
       <td>109</td>
-      <td>0.138363</td>
-      <td>0.138041</td>
-      <td>0.137430</td>
-      <td>0.158872</td>
-      <td>2.132927e-01</td>
-      <td>0.171035</td>
-      <td>0.171035</td>
-      <td>0.171035</td>
+      <td>0.1380</td>
+      <td>0.1374</td>
+      <td>0.1589</td>
+      <td>0.2133</td>
+      <td>0.1710</td>
+      <td>0.1710</td>
+      <td>0.1710</td>
+      <td>0.1710</td>
     </tr>
     <tr>
       <th>110</th>
       <td>110</td>
-      <td>0.008919</td>
-      <td>0.008784</td>
-      <td>0.007492</td>
-      <td>0.000720</td>
-      <td>8.888735e-03</td>
-      <td>1.116778</td>
-      <td>1.116778</td>
-      <td>1.116778</td>
+      <td>0.0088</td>
+      <td>0.0075</td>
+      <td>0.0007</td>
+      <td>0.0089</td>
+      <td>1.1168</td>
+      <td>1.1168</td>
+      <td>1.1168</td>
+      <td>1.1168</td>
     </tr>
     <tr>
       <th>111</th>
       <td>111</td>
-      <td>2.112668</td>
-      <td>2.114882</td>
-      <td>2.137053</td>
-      <td>2.355749</td>
-      <td>2.528523e+00</td>
-      <td>1.106065</td>
-      <td>1.106065</td>
-      <td>1.106065</td>
+      <td>2.1149</td>
+      <td>2.1371</td>
+      <td>2.3557</td>
+      <td>2.5285</td>
+      <td>1.1061</td>
+      <td>1.1061</td>
+      <td>1.1061</td>
+      <td>1.1061</td>
     </tr>
     <tr>
       <th>112</th>
       <td>112</td>
-      <td>0.001242</td>
-      <td>0.001305</td>
-      <td>0.002017</td>
-      <td>0.016369</td>
-      <td>5.823633e-02</td>
-      <td>0.001537</td>
-      <td>0.001537</td>
-      <td>0.001537</td>
+      <td>0.0013</td>
+      <td>0.0020</td>
+      <td>0.0164</td>
+      <td>0.0582</td>
+      <td>0.0015</td>
+      <td>0.0015</td>
+      <td>0.0015</td>
+      <td>0.0015</td>
     </tr>
     <tr>
       <th>113</th>
       <td>113</td>
-      <td>0.205141</td>
-      <td>0.206043</td>
-      <td>0.215149</td>
-      <td>0.299870</td>
-      <td>2.413589e-01</td>
-      <td>0.257853</td>
-      <td>0.257853</td>
-      <td>0.257853</td>
+      <td>0.2060</td>
+      <td>0.2151</td>
+      <td>0.2999</td>
+      <td>0.2414</td>
+      <td>0.2579</td>
+      <td>0.2579</td>
+      <td>0.2579</td>
+      <td>0.2579</td>
     </tr>
   </tbody>
 </table>
@@ -6518,10 +6625,14 @@ display(lasso_regression_LOOCV)
 
 
 ```python
+##################################
+# Transforming the dataframe
+# detailing the LOOCV results
+##################################
 lasso_regression_LOOCV = pd.melt(lasso_regression_LOOCV, 
-                                 id_vars=['case_index'], 
-                                 value_vars=['1e-05', '0.0001', '0.001', '0.01', '0.1', '1', '10', '100'], 
-                                 ignore_index=False)
+                                 id_vars = ['case_index'], 
+                                 value_vars = alphas_string, 
+                                 ignore_index = False)
 lasso_regression_LOOCV.rename(columns = {'variable':'alpha', 'value':'MSE'}, inplace = True)
 display(lasso_regression_LOOCV)
 ```
@@ -6554,32 +6665,32 @@ display(lasso_regression_LOOCV)
     <tr>
       <th>0</th>
       <td>0</td>
-      <td>1e-05</td>
-      <td>0.001151</td>
+      <td>0.0001</td>
+      <td>0.0011</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>1e-05</td>
-      <td>0.005789</td>
+      <td>0.0001</td>
+      <td>0.0058</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>1e-05</td>
-      <td>0.087208</td>
+      <td>0.0001</td>
+      <td>0.0872</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>1e-05</td>
-      <td>0.347277</td>
+      <td>0.0001</td>
+      <td>0.3470</td>
     </tr>
     <tr>
       <th>4</th>
       <td>4</td>
-      <td>1e-05</td>
-      <td>0.175571</td>
+      <td>0.0001</td>
+      <td>0.1760</td>
     </tr>
     <tr>
       <th>...</th>
@@ -6590,32 +6701,32 @@ display(lasso_regression_LOOCV)
     <tr>
       <th>109</th>
       <td>109</td>
-      <td>100</td>
-      <td>0.171035</td>
+      <td>1000</td>
+      <td>0.1710</td>
     </tr>
     <tr>
       <th>110</th>
       <td>110</td>
-      <td>100</td>
-      <td>1.116778</td>
+      <td>1000</td>
+      <td>1.1168</td>
     </tr>
     <tr>
       <th>111</th>
       <td>111</td>
-      <td>100</td>
-      <td>1.106065</td>
+      <td>1000</td>
+      <td>1.1061</td>
     </tr>
     <tr>
       <th>112</th>
       <td>112</td>
-      <td>100</td>
-      <td>0.001537</td>
+      <td>1000</td>
+      <td>0.0015</td>
     </tr>
     <tr>
       <th>113</th>
       <td>113</td>
-      <td>100</td>
-      <td>0.257853</td>
+      <td>1000</td>
+      <td>0.2579</td>
     </tr>
   </tbody>
 </table>
@@ -6632,7 +6743,16 @@ display(lasso_regression_LOOCV)
 ##################################
 sns.set(style="whitegrid")
 plt.figure(figsize=(10, 6))
-sns.boxplot(x='alpha', y='MSE', data=lasso_regression_LOOCV, color="#0070C0")
+plt.grid(True)
+sns.boxplot(x='alpha', 
+            y='MSE', 
+            data=lasso_regression_LOOCV, 
+            color='#0070C0',
+            showmeans=True,
+            meanprops={'marker':'o',
+                       'markerfacecolor':'#ADD8E6', 
+                       'markeredgecolor':'#FF0000',
+                       'markersize':'8'})
 plt.xlabel('Alpha Hyperparameter')
 plt.ylabel('Mean Squared Error')
 plt.title('Lasso Regression Hyperparameter Tuning Using LOOCV')
@@ -6641,7 +6761,7 @@ plt.show()
 
 
     
-![png](output_194_0.png)
+![png](output_195_0.png)
     
 
 
@@ -6695,21 +6815,21 @@ display(lasso_performance_train)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.629495</td>
+      <td>0.6295</td>
       <td>lasso_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.358573</td>
+      <td>0.3586</td>
       <td>lasso_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.460833</td>
+      <td>0.4608</td>
       <td>lasso_regression</td>
       <td>train</td>
     </tr>
@@ -6768,21 +6888,21 @@ display(lasso_performance_test)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.640452</td>
+      <td>0.6405</td>
       <td>lasso_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.375978</td>
+      <td>0.3760</td>
       <td>lasso_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.480495</td>
+      <td>0.4805</td>
       <td>lasso_regression</td>
       <td>test</td>
     </tr>
@@ -6799,6 +6919,7 @@ display(lasso_performance_test)
 ##################################
 figure = plt.figure(figsize=(10,6))
 axes = plt.axes()
+plt.grid(True)
 axes.plot(y_test, 
           lasso_y_hat_test, 
           marker='o', 
@@ -6814,11 +6935,30 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_197_0.png)
+![png](output_198_0.png)
     
 
 
 ### 1.6.6 Elastic Net Regression <a class="anchor" id="1.6.6"></a>
+
+[Elastic Net Regression](https://rss.onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2005.00503.x) is a regression technique aimed at preventing overfitting in linear regression models when the model is too complex and fits the training data very closely, but performs poorly on new and unseen data. The algorithm is a combination of the ridge and LASSO regression methods, by adding both L1 and L2 regularization terms in the cost function. This approach can be useful when there are many predictor variables that are correlated with the response variable, but only a subset of them are truly important for predicting the response. The L1 regularization term can help to select the important variables, while the L2 regularization term can help to reduce the magnitude of the coefficients. Hyperparameters alpha which serves as the constant that multiplies the penalty terms, and l1_ratio that serves as the mixing parameter that penalizes as a combination of L1 and L2 regularization - need to be optimized through cross-validation.
+
+1. The [elastic net regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 2 hyperparameters:
+    * <span style="color: #FF0000">l1_ratio</span> = l1_ratio made to vary across a range of values equal to 0.1 to 0.9
+    * <span style="color: #FF0000">alpha</span> = alpha made to vary across a range of values equal to 0.0001 to 1000
+3. Hyperparameter tuning was conducted using the leave-one-out-cross-validation method with optimal model performance determined for: 
+    * <span style="color: #FF0000">l1_ratio</span> = 0.9
+    * <span style="color: #FF0000">alpha</span> = 0.01
+4. The apparent model performance of the optimal model is summarized as follows:
+    * **R-Squared** = 0.6298
+    * **Mean Squared Error** = 0.3582
+    * **Mean Absolute Error** = 0.4608
+5. The independent test model performance of the final model is summarized as follows:
+    * **R-Squared** = 0.6409
+    * **Mean Squared Error** = 0.3755
+    * **Mean Absolute Error** = 0.4800
+6. Apparent and independent test model performance are relatively comparable, indicative of the absence of model overfitting.
 
 
 ```python
@@ -6826,8 +6966,24 @@ axes.set(xlabel='Actual Cancer Rate',
 # Defining the hyperparameters
 # for the elastic-net regression model
 ##################################
-alphas = [0.00001,0.0001,0.001,0.01,0.1,1,10,100]
 l1_ratios = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+alphas = [0.0001,0.001,0.01,0.1,1,10,100,1000]
+
+##################################
+# Formulating a string equivalent 
+# of the l1_ratio hyperparameter list
+##################################
+l1_ratios_string = map(str, l1_ratios)
+l1_ratios_string_reversed = list(l1_ratios_string)
+l1_ratios_string_reversed.reverse()
+
+##################################
+# Formulating a string equivalent 
+# of the alpha hyperparameter list
+##################################
+alphas_string = map(str, alphas)
+alphas_string_reversed = list(alphas_string)
+alphas_string_reversed.reverse()
 
 ##################################
 # Defining a pipeline for the 
@@ -6848,18 +7004,18 @@ elasticnet_regression_pipeline.fit(X_train, y_train)
 <style>#sk-container-id-5 {color: black;}#sk-container-id-5 pre{padding: 0;}#sk-container-id-5 div.sk-toggleable {background-color: white;}#sk-container-id-5 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-5 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-5 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-5 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-5 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-5 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-5 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-5 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-5 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-5 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-5 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-5 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-5 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-5 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-5 div.sk-item {position: relative;z-index: 1;}#sk-container-id-5 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-5 div.sk-item::before, #sk-container-id-5 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-5 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-5 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-5 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-5 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-5 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-5 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-5 div.sk-label-container {text-align: center;}#sk-container-id-5 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-5 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-5" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;polynomial_features&#x27;,
                  PolynomialFeatures(degree=1, include_bias=False)),
                 (&#x27;elasticnet_regression&#x27;,
-                 ElasticNetCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10,
-                                      100],
+                 ElasticNetCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100,
+                                      1000],
                               cv=LeaveOneOut(),
                               l1_ratio=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
                                         0.9]))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-13" type="checkbox" ><label for="sk-estimator-id-13" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;polynomial_features&#x27;,
                  PolynomialFeatures(degree=1, include_bias=False)),
                 (&#x27;elasticnet_regression&#x27;,
-                 ElasticNetCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10,
-                                      100],
+                 ElasticNetCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100,
+                                      1000],
                               cv=LeaveOneOut(),
                               l1_ratio=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
-                                        0.9]))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-14" type="checkbox" ><label for="sk-estimator-id-14" class="sk-toggleable__label sk-toggleable__label-arrow">PolynomialFeatures</label><div class="sk-toggleable__content"><pre>PolynomialFeatures(degree=1, include_bias=False)</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox" ><label for="sk-estimator-id-15" class="sk-toggleable__label sk-toggleable__label-arrow">ElasticNetCV</label><div class="sk-toggleable__content"><pre>ElasticNetCV(alphas=[1e-05, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+                                        0.9]))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-14" type="checkbox" ><label for="sk-estimator-id-14" class="sk-toggleable__label sk-toggleable__label-arrow">PolynomialFeatures</label><div class="sk-toggleable__content"><pre>PolynomialFeatures(degree=1, include_bias=False)</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox" ><label for="sk-estimator-id-15" class="sk-toggleable__label sk-toggleable__label-arrow">ElasticNetCV</label><div class="sk-toggleable__content"><pre>ElasticNetCV(alphas=[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
              cv=LeaveOneOut(),
              l1_ratio=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])</pre></div></div></div></div></div></div></div>
 
@@ -6897,19 +7053,24 @@ elasticnet_regression_pipeline['elasticnet_regression'].l1_ratio_
 
 
 ```python
+##################################
+# Consolidating the LOOCV results
+##################################
 elasticnet_regression_LOOCV_raw = elasticnet_regression_pipeline['elasticnet_regression'].mse_path_
 elasticnet_regression_LOOCV = pd.DataFrame(elasticnet_regression_LOOCV_raw.reshape(-1, 114))
 elasticnet_regression_LOOCV.index = np.repeat(np.arange(elasticnet_regression_LOOCV_raw.shape[0]), elasticnet_regression_LOOCV_raw.shape[1]) + 1
-# elasticnet_regression_LOOCV = pd.DataFrame(elasticnet_regression_pipeline['elasticnet_regression'].mse_path_)
-# elasticnet_regression_LOOCV = elasticnet_regression_LOOCV[[7,6,5,4,3,2,1,0]]
-# elasticnet_regression_LOOCV = elasticnet_regression_LOOCV.set_axis(map(str, alphas), axis=1)
 elasticnet_regression_LOOCV.index.name = 'l1_ratio'
 elasticnet_regression_LOOCV.reset_index(inplace=True)
+```
+
+
+```python
+##################################
+# Creating a dataframe based on l1_ratio
+# from the LOOCV results
+##################################
 elasticnet_regression_LOOCV_l1_ratio = elasticnet_regression_LOOCV
-elasticnet_regression_LOOCV_alpha = elasticnet_regression_LOOCV.drop(['l1_ratio'], axis=1)
-elasticnet_regression_LOOCV_alpha['alpha'] = list(range(1,9))*9
 display(elasticnet_regression_LOOCV_l1_ratio)
-display(elasticnet_regression_LOOCV_alpha)
 ```
 
 
@@ -6958,122 +7119,122 @@ display(elasticnet_regression_LOOCV_alpha)
     <tr>
       <th>0</th>
       <td>1</td>
-      <td>0.001986</td>
-      <td>1.521063</td>
-      <td>1.532790</td>
-      <td>0.193144</td>
-      <td>2.301457</td>
-      <td>0.606708</td>
-      <td>0.288359</td>
-      <td>1.276638</td>
-      <td>0.416675</td>
+      <td>0.0020</td>
+      <td>1.5211</td>
+      <td>1.5328</td>
+      <td>0.1931</td>
+      <td>2.3015</td>
+      <td>0.6067</td>
+      <td>0.2884</td>
+      <td>1.2766</td>
+      <td>0.4167</td>
       <td>...</td>
-      <td>0.013261</td>
-      <td>0.930731</td>
-      <td>2.795143</td>
-      <td>2.295627</td>
-      <td>0.606630</td>
-      <td>0.171035</td>
-      <td>1.116778</td>
-      <td>1.106065</td>
-      <td>0.001537</td>
-      <td>0.257853</td>
+      <td>0.0133</td>
+      <td>0.9307</td>
+      <td>2.7951</td>
+      <td>2.2956</td>
+      <td>0.6066</td>
+      <td>0.1710</td>
+      <td>1.1168</td>
+      <td>1.1061</td>
+      <td>0.0015</td>
+      <td>0.2579</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>0.001986</td>
-      <td>1.521063</td>
-      <td>1.532790</td>
-      <td>0.193144</td>
-      <td>2.301457</td>
-      <td>0.606708</td>
-      <td>0.288359</td>
-      <td>1.276638</td>
-      <td>0.416675</td>
+      <td>0.0020</td>
+      <td>1.5211</td>
+      <td>1.5328</td>
+      <td>0.1931</td>
+      <td>2.3015</td>
+      <td>0.6067</td>
+      <td>0.2884</td>
+      <td>1.2766</td>
+      <td>0.4167</td>
       <td>...</td>
-      <td>0.013261</td>
-      <td>0.930731</td>
-      <td>2.795143</td>
-      <td>2.295627</td>
-      <td>0.606630</td>
-      <td>0.171035</td>
-      <td>1.116778</td>
-      <td>1.106065</td>
-      <td>0.001537</td>
-      <td>0.257853</td>
+      <td>0.0133</td>
+      <td>0.9307</td>
+      <td>2.7951</td>
+      <td>2.2956</td>
+      <td>0.6066</td>
+      <td>0.1710</td>
+      <td>1.1168</td>
+      <td>1.1061</td>
+      <td>0.0015</td>
+      <td>0.2579</td>
     </tr>
     <tr>
       <th>2</th>
       <td>1</td>
-      <td>0.002180</td>
-      <td>0.117263</td>
-      <td>0.328383</td>
-      <td>0.284991</td>
-      <td>0.875727</td>
-      <td>0.851401</td>
-      <td>0.145784</td>
-      <td>0.270460</td>
-      <td>0.029496</td>
+      <td>0.0020</td>
+      <td>1.5211</td>
+      <td>1.5328</td>
+      <td>0.1931</td>
+      <td>2.3015</td>
+      <td>0.6067</td>
+      <td>0.2884</td>
+      <td>1.2766</td>
+      <td>0.4167</td>
       <td>...</td>
-      <td>0.001369</td>
-      <td>1.848020</td>
-      <td>1.563614</td>
-      <td>0.621738</td>
-      <td>0.386597</td>
-      <td>0.120456</td>
-      <td>0.119069</td>
-      <td>2.364307</td>
-      <td>0.078092</td>
-      <td>0.079203</td>
+      <td>0.0133</td>
+      <td>0.9307</td>
+      <td>2.7951</td>
+      <td>2.2956</td>
+      <td>0.6066</td>
+      <td>0.1710</td>
+      <td>1.1168</td>
+      <td>1.1061</td>
+      <td>0.0015</td>
+      <td>0.2579</td>
     </tr>
     <tr>
       <th>3</th>
       <td>1</td>
-      <td>0.004898</td>
-      <td>0.001018</td>
-      <td>0.099375</td>
-      <td>0.320565</td>
-      <td>0.364115</td>
-      <td>0.868878</td>
-      <td>0.543334</td>
-      <td>0.062553</td>
-      <td>0.013176</td>
+      <td>0.0022</td>
+      <td>0.1173</td>
+      <td>0.3284</td>
+      <td>0.2850</td>
+      <td>0.8757</td>
+      <td>0.8514</td>
+      <td>0.1458</td>
+      <td>0.2705</td>
+      <td>0.0295</td>
       <td>...</td>
-      <td>0.008111</td>
-      <td>2.024127</td>
-      <td>1.558421</td>
-      <td>0.170141</td>
-      <td>0.300196</td>
-      <td>0.123464</td>
-      <td>0.000131</td>
-      <td>2.668826</td>
-      <td>0.098684</td>
-      <td>0.393049</td>
+      <td>0.0014</td>
+      <td>1.8480</td>
+      <td>1.5636</td>
+      <td>0.6217</td>
+      <td>0.3866</td>
+      <td>0.1205</td>
+      <td>0.1191</td>
+      <td>2.3643</td>
+      <td>0.0781</td>
+      <td>0.0792</td>
     </tr>
     <tr>
       <th>4</th>
       <td>1</td>
-      <td>0.001744</td>
-      <td>0.004717</td>
-      <td>0.084629</td>
-      <td>0.338029</td>
-      <td>0.202147</td>
-      <td>0.800572</td>
-      <td>0.715359</td>
-      <td>0.033860</td>
-      <td>0.029507</td>
+      <td>0.0049</td>
+      <td>0.0010</td>
+      <td>0.0994</td>
+      <td>0.3206</td>
+      <td>0.3641</td>
+      <td>0.8689</td>
+      <td>0.5433</td>
+      <td>0.0626</td>
+      <td>0.0132</td>
       <td>...</td>
-      <td>0.020843</td>
-      <td>1.631225</td>
-      <td>1.951641</td>
-      <td>0.120272</td>
-      <td>0.302309</td>
-      <td>0.131549</td>
-      <td>0.004981</td>
-      <td>2.215933</td>
-      <td>0.010435</td>
-      <td>0.252451</td>
+      <td>0.0081</td>
+      <td>2.0241</td>
+      <td>1.5584</td>
+      <td>0.1701</td>
+      <td>0.3002</td>
+      <td>0.1235</td>
+      <td>0.0001</td>
+      <td>2.6688</td>
+      <td>0.0987</td>
+      <td>0.3930</td>
     </tr>
     <tr>
       <th>...</th>
@@ -7102,128 +7263,139 @@ display(elasticnet_regression_LOOCV_alpha)
     <tr>
       <th>67</th>
       <td>9</td>
-      <td>0.000077</td>
-      <td>0.005051</td>
-      <td>0.202880</td>
-      <td>0.384009</td>
-      <td>0.511308</td>
-      <td>0.845922</td>
-      <td>0.425701</td>
-      <td>0.160143</td>
-      <td>0.006694</td>
+      <td>0.0020</td>
+      <td>1.5211</td>
+      <td>1.5328</td>
+      <td>0.1931</td>
+      <td>2.3015</td>
+      <td>0.6067</td>
+      <td>0.2884</td>
+      <td>1.2766</td>
+      <td>0.4167</td>
       <td>...</td>
-      <td>0.002735</td>
-      <td>1.988705</td>
-      <td>1.678017</td>
-      <td>0.270301</td>
-      <td>0.251397</td>
-      <td>0.203156</td>
-      <td>0.006586</td>
-      <td>2.540391</td>
-      <td>0.065008</td>
-      <td>0.261356</td>
+      <td>0.0133</td>
+      <td>0.9307</td>
+      <td>2.7951</td>
+      <td>2.2956</td>
+      <td>0.6066</td>
+      <td>0.1710</td>
+      <td>1.1168</td>
+      <td>1.1061</td>
+      <td>0.0015</td>
+      <td>0.2579</td>
     </tr>
     <tr>
       <th>68</th>
       <td>9</td>
-      <td>0.000744</td>
-      <td>0.005206</td>
-      <td>0.087470</td>
-      <td>0.387007</td>
-      <td>0.220033</td>
-      <td>0.800422</td>
-      <td>0.732841</td>
-      <td>0.048038</td>
-      <td>0.033787</td>
+      <td>0.0001</td>
+      <td>0.0051</td>
+      <td>0.2029</td>
+      <td>0.3840</td>
+      <td>0.5113</td>
+      <td>0.8459</td>
+      <td>0.4257</td>
+      <td>0.1601</td>
+      <td>0.0067</td>
       <td>...</td>
-      <td>0.008468</td>
-      <td>1.757867</td>
-      <td>1.844412</td>
-      <td>0.150751</td>
-      <td>0.300576</td>
-      <td>0.155487</td>
-      <td>0.000708</td>
-      <td>2.340484</td>
-      <td>0.015830</td>
-      <td>0.296486</td>
+      <td>0.0027</td>
+      <td>1.9887</td>
+      <td>1.6780</td>
+      <td>0.2703</td>
+      <td>0.2514</td>
+      <td>0.2032</td>
+      <td>0.0066</td>
+      <td>2.5404</td>
+      <td>0.0650</td>
+      <td>0.2614</td>
     </tr>
     <tr>
       <th>69</th>
       <td>9</td>
-      <td>0.000742</td>
-      <td>0.005726</td>
-      <td>0.087178</td>
-      <td>0.344789</td>
-      <td>0.179835</td>
-      <td>0.782998</td>
-      <td>0.756928</td>
-      <td>0.032755</td>
-      <td>0.031480</td>
+      <td>0.0007</td>
+      <td>0.0052</td>
+      <td>0.0875</td>
+      <td>0.3870</td>
+      <td>0.2200</td>
+      <td>0.8004</td>
+      <td>0.7328</td>
+      <td>0.0480</td>
+      <td>0.0338</td>
       <td>...</td>
-      <td>0.023337</td>
-      <td>1.568980</td>
-      <td>2.045105</td>
-      <td>0.115359</td>
-      <td>0.295028</td>
-      <td>0.137263</td>
-      <td>0.007597</td>
-      <td>2.135550</td>
-      <td>0.001995</td>
-      <td>0.214586</td>
+      <td>0.0085</td>
+      <td>1.7579</td>
+      <td>1.8444</td>
+      <td>0.1508</td>
+      <td>0.3006</td>
+      <td>0.1555</td>
+      <td>0.0007</td>
+      <td>2.3405</td>
+      <td>0.0158</td>
+      <td>0.2965</td>
     </tr>
     <tr>
       <th>70</th>
       <td>9</td>
-      <td>0.001111</td>
-      <td>0.005783</td>
-      <td>0.087205</td>
-      <td>0.347050</td>
-      <td>0.175956</td>
-      <td>0.781141</td>
-      <td>0.763287</td>
-      <td>0.031386</td>
-      <td>0.031257</td>
+      <td>0.0007</td>
+      <td>0.0057</td>
+      <td>0.0872</td>
+      <td>0.3448</td>
+      <td>0.1798</td>
+      <td>0.7830</td>
+      <td>0.7569</td>
+      <td>0.0328</td>
+      <td>0.0315</td>
       <td>...</td>
-      <td>0.025333</td>
-      <td>1.550017</td>
-      <td>2.078843</td>
-      <td>0.112113</td>
-      <td>0.294163</td>
-      <td>0.138065</td>
-      <td>0.008795</td>
-      <td>2.114736</td>
-      <td>0.001303</td>
-      <td>0.205989</td>
+      <td>0.0233</td>
+      <td>1.5690</td>
+      <td>2.0451</td>
+      <td>0.1154</td>
+      <td>0.2950</td>
+      <td>0.1373</td>
+      <td>0.0076</td>
+      <td>2.1355</td>
+      <td>0.0020</td>
+      <td>0.2146</td>
     </tr>
     <tr>
       <th>71</th>
       <td>9</td>
-      <td>0.001152</td>
-      <td>0.005789</td>
-      <td>0.087208</td>
-      <td>0.347277</td>
-      <td>0.175569</td>
-      <td>0.780954</td>
-      <td>0.764078</td>
-      <td>0.031250</td>
-      <td>0.031235</td>
+      <td>0.0011</td>
+      <td>0.0058</td>
+      <td>0.0872</td>
+      <td>0.3470</td>
+      <td>0.1760</td>
+      <td>0.7811</td>
+      <td>0.7633</td>
+      <td>0.0314</td>
+      <td>0.0313</td>
       <td>...</td>
-      <td>0.025537</td>
-      <td>1.548394</td>
-      <td>2.082244</td>
-      <td>0.112053</td>
-      <td>0.294076</td>
-      <td>0.138365</td>
-      <td>0.008920</td>
-      <td>2.112653</td>
-      <td>0.001242</td>
-      <td>0.205136</td>
+      <td>0.0253</td>
+      <td>1.5500</td>
+      <td>2.0788</td>
+      <td>0.1121</td>
+      <td>0.2942</td>
+      <td>0.1381</td>
+      <td>0.0088</td>
+      <td>2.1147</td>
+      <td>0.0013</td>
+      <td>0.2060</td>
     </tr>
   </tbody>
 </table>
 <p>72 rows × 115 columns</p>
 </div>
 
+
+
+```python
+##################################
+# Creating a dataframe based on alpha
+# from the LOOCV results
+##################################
+elasticnet_regression_LOOCV_alpha = elasticnet_regression_LOOCV.drop(['l1_ratio'], axis=1)
+elasticnet_regression_LOOCV_alpha['alpha'] = list(range(1,9))*9
+display(elasticnet_regression_LOOCV_alpha)
+```
 
 
 <div>
@@ -7270,122 +7442,122 @@ display(elasticnet_regression_LOOCV_alpha)
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.001986</td>
-      <td>1.521063</td>
-      <td>1.532790</td>
-      <td>0.193144</td>
-      <td>2.301457</td>
-      <td>0.606708</td>
-      <td>0.288359</td>
-      <td>1.276638</td>
-      <td>0.416675</td>
-      <td>0.288359</td>
+      <td>0.0020</td>
+      <td>1.5211</td>
+      <td>1.5328</td>
+      <td>0.1931</td>
+      <td>2.3015</td>
+      <td>0.6067</td>
+      <td>0.2884</td>
+      <td>1.2766</td>
+      <td>0.4167</td>
+      <td>0.2884</td>
       <td>...</td>
-      <td>0.930731</td>
-      <td>2.795143</td>
-      <td>2.295627</td>
-      <td>0.606630</td>
-      <td>0.171035</td>
-      <td>1.116778</td>
-      <td>1.106065</td>
-      <td>0.001537</td>
-      <td>0.257853</td>
+      <td>0.9307</td>
+      <td>2.7951</td>
+      <td>2.2956</td>
+      <td>0.6066</td>
+      <td>0.1710</td>
+      <td>1.1168</td>
+      <td>1.1061</td>
+      <td>0.0015</td>
+      <td>0.2579</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.001986</td>
-      <td>1.521063</td>
-      <td>1.532790</td>
-      <td>0.193144</td>
-      <td>2.301457</td>
-      <td>0.606708</td>
-      <td>0.288359</td>
-      <td>1.276638</td>
-      <td>0.416675</td>
-      <td>0.288359</td>
+      <td>0.0020</td>
+      <td>1.5211</td>
+      <td>1.5328</td>
+      <td>0.1931</td>
+      <td>2.3015</td>
+      <td>0.6067</td>
+      <td>0.2884</td>
+      <td>1.2766</td>
+      <td>0.4167</td>
+      <td>0.2884</td>
       <td>...</td>
-      <td>0.930731</td>
-      <td>2.795143</td>
-      <td>2.295627</td>
-      <td>0.606630</td>
-      <td>0.171035</td>
-      <td>1.116778</td>
-      <td>1.106065</td>
-      <td>0.001537</td>
-      <td>0.257853</td>
+      <td>0.9307</td>
+      <td>2.7951</td>
+      <td>2.2956</td>
+      <td>0.6066</td>
+      <td>0.1710</td>
+      <td>1.1168</td>
+      <td>1.1061</td>
+      <td>0.0015</td>
+      <td>0.2579</td>
       <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.002180</td>
-      <td>0.117263</td>
-      <td>0.328383</td>
-      <td>0.284991</td>
-      <td>0.875727</td>
-      <td>0.851401</td>
-      <td>0.145784</td>
-      <td>0.270460</td>
-      <td>0.029496</td>
-      <td>0.000205</td>
+      <td>0.0020</td>
+      <td>1.5211</td>
+      <td>1.5328</td>
+      <td>0.1931</td>
+      <td>2.3015</td>
+      <td>0.6067</td>
+      <td>0.2884</td>
+      <td>1.2766</td>
+      <td>0.4167</td>
+      <td>0.2884</td>
       <td>...</td>
-      <td>1.848020</td>
-      <td>1.563614</td>
-      <td>0.621738</td>
-      <td>0.386597</td>
-      <td>0.120456</td>
-      <td>0.119069</td>
-      <td>2.364307</td>
-      <td>0.078092</td>
-      <td>0.079203</td>
+      <td>0.9307</td>
+      <td>2.7951</td>
+      <td>2.2956</td>
+      <td>0.6066</td>
+      <td>0.1710</td>
+      <td>1.1168</td>
+      <td>1.1061</td>
+      <td>0.0015</td>
+      <td>0.2579</td>
       <td>3</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0.004898</td>
-      <td>0.001018</td>
-      <td>0.099375</td>
-      <td>0.320565</td>
-      <td>0.364115</td>
-      <td>0.868878</td>
-      <td>0.543334</td>
-      <td>0.062553</td>
-      <td>0.013176</td>
-      <td>0.043306</td>
+      <td>0.0022</td>
+      <td>0.1173</td>
+      <td>0.3284</td>
+      <td>0.2850</td>
+      <td>0.8757</td>
+      <td>0.8514</td>
+      <td>0.1458</td>
+      <td>0.2705</td>
+      <td>0.0295</td>
+      <td>0.0002</td>
       <td>...</td>
-      <td>2.024127</td>
-      <td>1.558421</td>
-      <td>0.170141</td>
-      <td>0.300196</td>
-      <td>0.123464</td>
-      <td>0.000131</td>
-      <td>2.668826</td>
-      <td>0.098684</td>
-      <td>0.393049</td>
+      <td>1.8480</td>
+      <td>1.5636</td>
+      <td>0.6217</td>
+      <td>0.3866</td>
+      <td>0.1205</td>
+      <td>0.1191</td>
+      <td>2.3643</td>
+      <td>0.0781</td>
+      <td>0.0792</td>
       <td>4</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0.001744</td>
-      <td>0.004717</td>
-      <td>0.084629</td>
-      <td>0.338029</td>
-      <td>0.202147</td>
-      <td>0.800572</td>
-      <td>0.715359</td>
-      <td>0.033860</td>
-      <td>0.029507</td>
-      <td>0.070218</td>
+      <td>0.0049</td>
+      <td>0.0010</td>
+      <td>0.0994</td>
+      <td>0.3206</td>
+      <td>0.3641</td>
+      <td>0.8689</td>
+      <td>0.5433</td>
+      <td>0.0626</td>
+      <td>0.0132</td>
+      <td>0.0433</td>
       <td>...</td>
-      <td>1.631225</td>
-      <td>1.951641</td>
-      <td>0.120272</td>
-      <td>0.302309</td>
-      <td>0.131549</td>
-      <td>0.004981</td>
-      <td>2.215933</td>
-      <td>0.010435</td>
-      <td>0.252451</td>
+      <td>2.0241</td>
+      <td>1.5584</td>
+      <td>0.1701</td>
+      <td>0.3002</td>
+      <td>0.1235</td>
+      <td>0.0001</td>
+      <td>2.6688</td>
+      <td>0.0987</td>
+      <td>0.3930</td>
       <td>5</td>
     </tr>
     <tr>
@@ -7414,122 +7586,122 @@ display(elasticnet_regression_LOOCV_alpha)
     </tr>
     <tr>
       <th>67</th>
-      <td>0.000077</td>
-      <td>0.005051</td>
-      <td>0.202880</td>
-      <td>0.384009</td>
-      <td>0.511308</td>
-      <td>0.845922</td>
-      <td>0.425701</td>
-      <td>0.160143</td>
-      <td>0.006694</td>
-      <td>0.018909</td>
+      <td>0.0020</td>
+      <td>1.5211</td>
+      <td>1.5328</td>
+      <td>0.1931</td>
+      <td>2.3015</td>
+      <td>0.6067</td>
+      <td>0.2884</td>
+      <td>1.2766</td>
+      <td>0.4167</td>
+      <td>0.2884</td>
       <td>...</td>
-      <td>1.988705</td>
-      <td>1.678017</td>
-      <td>0.270301</td>
-      <td>0.251397</td>
-      <td>0.203156</td>
-      <td>0.006586</td>
-      <td>2.540391</td>
-      <td>0.065008</td>
-      <td>0.261356</td>
+      <td>0.9307</td>
+      <td>2.7951</td>
+      <td>2.2956</td>
+      <td>0.6066</td>
+      <td>0.1710</td>
+      <td>1.1168</td>
+      <td>1.1061</td>
+      <td>0.0015</td>
+      <td>0.2579</td>
       <td>4</td>
     </tr>
     <tr>
       <th>68</th>
-      <td>0.000744</td>
-      <td>0.005206</td>
-      <td>0.087470</td>
-      <td>0.387007</td>
-      <td>0.220033</td>
-      <td>0.800422</td>
-      <td>0.732841</td>
-      <td>0.048038</td>
-      <td>0.033787</td>
-      <td>0.079552</td>
+      <td>0.0001</td>
+      <td>0.0051</td>
+      <td>0.2029</td>
+      <td>0.3840</td>
+      <td>0.5113</td>
+      <td>0.8459</td>
+      <td>0.4257</td>
+      <td>0.1601</td>
+      <td>0.0067</td>
+      <td>0.0189</td>
       <td>...</td>
-      <td>1.757867</td>
-      <td>1.844412</td>
-      <td>0.150751</td>
-      <td>0.300576</td>
-      <td>0.155487</td>
-      <td>0.000708</td>
-      <td>2.340484</td>
-      <td>0.015830</td>
-      <td>0.296486</td>
+      <td>1.9887</td>
+      <td>1.6780</td>
+      <td>0.2703</td>
+      <td>0.2514</td>
+      <td>0.2032</td>
+      <td>0.0066</td>
+      <td>2.5404</td>
+      <td>0.0650</td>
+      <td>0.2614</td>
       <td>5</td>
     </tr>
     <tr>
       <th>69</th>
-      <td>0.000742</td>
-      <td>0.005726</td>
-      <td>0.087178</td>
-      <td>0.344789</td>
-      <td>0.179835</td>
-      <td>0.782998</td>
-      <td>0.756928</td>
-      <td>0.032755</td>
-      <td>0.031480</td>
-      <td>0.075216</td>
+      <td>0.0007</td>
+      <td>0.0052</td>
+      <td>0.0875</td>
+      <td>0.3870</td>
+      <td>0.2200</td>
+      <td>0.8004</td>
+      <td>0.7328</td>
+      <td>0.0480</td>
+      <td>0.0338</td>
+      <td>0.0796</td>
       <td>...</td>
-      <td>1.568980</td>
-      <td>2.045105</td>
-      <td>0.115359</td>
-      <td>0.295028</td>
-      <td>0.137263</td>
-      <td>0.007597</td>
-      <td>2.135550</td>
-      <td>0.001995</td>
-      <td>0.214586</td>
+      <td>1.7579</td>
+      <td>1.8444</td>
+      <td>0.1508</td>
+      <td>0.3006</td>
+      <td>0.1555</td>
+      <td>0.0007</td>
+      <td>2.3405</td>
+      <td>0.0158</td>
+      <td>0.2965</td>
       <td>6</td>
     </tr>
     <tr>
       <th>70</th>
-      <td>0.001111</td>
-      <td>0.005783</td>
-      <td>0.087205</td>
-      <td>0.347050</td>
-      <td>0.175956</td>
-      <td>0.781141</td>
-      <td>0.763287</td>
-      <td>0.031386</td>
-      <td>0.031257</td>
-      <td>0.074964</td>
+      <td>0.0007</td>
+      <td>0.0057</td>
+      <td>0.0872</td>
+      <td>0.3448</td>
+      <td>0.1798</td>
+      <td>0.7830</td>
+      <td>0.7569</td>
+      <td>0.0328</td>
+      <td>0.0315</td>
+      <td>0.0752</td>
       <td>...</td>
-      <td>1.550017</td>
-      <td>2.078843</td>
-      <td>0.112113</td>
-      <td>0.294163</td>
-      <td>0.138065</td>
-      <td>0.008795</td>
-      <td>2.114736</td>
-      <td>0.001303</td>
-      <td>0.205989</td>
+      <td>1.5690</td>
+      <td>2.0451</td>
+      <td>0.1154</td>
+      <td>0.2950</td>
+      <td>0.1373</td>
+      <td>0.0076</td>
+      <td>2.1355</td>
+      <td>0.0020</td>
+      <td>0.2146</td>
       <td>7</td>
     </tr>
     <tr>
       <th>71</th>
-      <td>0.001152</td>
-      <td>0.005789</td>
-      <td>0.087208</td>
-      <td>0.347277</td>
-      <td>0.175569</td>
-      <td>0.780954</td>
-      <td>0.764078</td>
-      <td>0.031250</td>
-      <td>0.031235</td>
-      <td>0.075207</td>
+      <td>0.0011</td>
+      <td>0.0058</td>
+      <td>0.0872</td>
+      <td>0.3470</td>
+      <td>0.1760</td>
+      <td>0.7811</td>
+      <td>0.7633</td>
+      <td>0.0314</td>
+      <td>0.0313</td>
+      <td>0.0750</td>
       <td>...</td>
-      <td>1.548394</td>
-      <td>2.082244</td>
-      <td>0.112053</td>
-      <td>0.294076</td>
-      <td>0.138365</td>
-      <td>0.008920</td>
-      <td>2.112653</td>
-      <td>0.001242</td>
-      <td>0.205136</td>
+      <td>1.5500</td>
+      <td>2.0788</td>
+      <td>0.1121</td>
+      <td>0.2942</td>
+      <td>0.1381</td>
+      <td>0.0088</td>
+      <td>2.1147</td>
+      <td>0.0013</td>
+      <td>0.2060</td>
       <td>8</td>
     </tr>
   </tbody>
@@ -7540,6 +7712,10 @@ display(elasticnet_regression_LOOCV_alpha)
 
 
 ```python
+##################################
+# Transforming the l1_ratio dataframe
+# detailing the LOOCV results
+##################################
 elasticnet_regression_LOOCV_l1_ratio = pd.melt(elasticnet_regression_LOOCV_l1_ratio, 
                                                id_vars=['l1_ratio'], 
                                                value_vars=list(range(0,114)), 
@@ -7577,31 +7753,31 @@ display(elasticnet_regression_LOOCV_l1_ratio)
       <th>0</th>
       <td>1</td>
       <td>0</td>
-      <td>0.001986</td>
+      <td>0.0020</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
       <td>0</td>
-      <td>0.001986</td>
+      <td>0.0020</td>
     </tr>
     <tr>
       <th>2</th>
       <td>1</td>
       <td>0</td>
-      <td>0.002180</td>
+      <td>0.0020</td>
     </tr>
     <tr>
       <th>3</th>
       <td>1</td>
       <td>0</td>
-      <td>0.004898</td>
+      <td>0.0022</td>
     </tr>
     <tr>
       <th>4</th>
       <td>1</td>
       <td>0</td>
-      <td>0.001744</td>
+      <td>0.0049</td>
     </tr>
     <tr>
       <th>...</th>
@@ -7613,31 +7789,31 @@ display(elasticnet_regression_LOOCV_l1_ratio)
       <th>67</th>
       <td>9</td>
       <td>113</td>
-      <td>0.261356</td>
+      <td>0.2579</td>
     </tr>
     <tr>
       <th>68</th>
       <td>9</td>
       <td>113</td>
-      <td>0.296486</td>
+      <td>0.2614</td>
     </tr>
     <tr>
       <th>69</th>
       <td>9</td>
       <td>113</td>
-      <td>0.214586</td>
+      <td>0.2965</td>
     </tr>
     <tr>
       <th>70</th>
       <td>9</td>
       <td>113</td>
-      <td>0.205989</td>
+      <td>0.2146</td>
     </tr>
     <tr>
       <th>71</th>
       <td>9</td>
       <td>113</td>
-      <td>0.205136</td>
+      <td>0.2060</td>
     </tr>
   </tbody>
 </table>
@@ -7648,13 +7824,46 @@ display(elasticnet_regression_LOOCV_l1_ratio)
 
 ```python
 ##################################
+# Renaming the l1_ratio levels
+# based on the proper category labels
+##################################
+elasticnet_regression_LOOCV_l1_ratio_conditions = [
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 1),
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 2),
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 3),
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 4),
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 5),
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 6),
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 7),
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 8),
+    (elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] == 9)]
+
+elasticnet_regression_LOOCV_l1_ratio_values = l1_ratios_string_reversed
+elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] = np.select(elasticnet_regression_LOOCV_l1_ratio_conditions,
+                                                         elasticnet_regression_LOOCV_l1_ratio_values,
+                                                         default=np.nan)
+elasticnet_regression_LOOCV_l1_ratio['l1_ratio'] = elasticnet_regression_LOOCV_l1_ratio['l1_ratio'].astype('category')
+```
+
+
+```python
+##################################
 # Plotting the elasticnet regression
 # hyperparameter tuning results
 # using LOOCV
 ##################################
 sns.set(style="whitegrid")
 plt.figure(figsize=(10, 6))
-sns.boxplot(x='l1_ratio', y='MSE', data=elasticnet_regression_LOOCV_l1_ratio, color="#0070C0")
+plt.grid(True)
+sns.boxplot(x='l1_ratio', 
+            y='MSE', 
+            data=elasticnet_regression_LOOCV_l1_ratio, 
+            color='#0070C0', 
+            showmeans=True,
+            meanprops={'marker':'o',
+                       'markerfacecolor':'#ADD8E6', 
+                       'markeredgecolor':'#FF0000',
+                       'markersize':'8'})
 plt.xlabel('L1 Ratio Hyperparameter')
 plt.ylabel('Mean Squared Error')
 plt.title('Elastic Net Regression Hyperparameter Tuning Using LOOCV')
@@ -7663,12 +7872,16 @@ plt.show()
 
 
     
-![png](output_204_0.png)
+![png](output_208_0.png)
     
 
 
 
 ```python
+##################################
+# Transforming the alpha dataframe
+# detailing the LOOCV results
+##################################
 elasticnet_regression_LOOCV_alpha = pd.melt(elasticnet_regression_LOOCV_alpha, 
                                                id_vars=['alpha'], 
                                                value_vars=list(range(0,114)), 
@@ -7706,31 +7919,31 @@ display(elasticnet_regression_LOOCV_alpha)
       <th>0</th>
       <td>1</td>
       <td>0</td>
-      <td>0.001986</td>
+      <td>0.0020</td>
     </tr>
     <tr>
       <th>1</th>
       <td>2</td>
       <td>0</td>
-      <td>0.001986</td>
+      <td>0.0020</td>
     </tr>
     <tr>
       <th>2</th>
       <td>3</td>
       <td>0</td>
-      <td>0.002180</td>
+      <td>0.0020</td>
     </tr>
     <tr>
       <th>3</th>
       <td>4</td>
       <td>0</td>
-      <td>0.004898</td>
+      <td>0.0022</td>
     </tr>
     <tr>
       <th>4</th>
       <td>5</td>
       <td>0</td>
-      <td>0.001744</td>
+      <td>0.0049</td>
     </tr>
     <tr>
       <th>...</th>
@@ -7742,31 +7955,31 @@ display(elasticnet_regression_LOOCV_alpha)
       <th>67</th>
       <td>4</td>
       <td>113</td>
-      <td>0.261356</td>
+      <td>0.2579</td>
     </tr>
     <tr>
       <th>68</th>
       <td>5</td>
       <td>113</td>
-      <td>0.296486</td>
+      <td>0.2614</td>
     </tr>
     <tr>
       <th>69</th>
       <td>6</td>
       <td>113</td>
-      <td>0.214586</td>
+      <td>0.2965</td>
     </tr>
     <tr>
       <th>70</th>
       <td>7</td>
       <td>113</td>
-      <td>0.205989</td>
+      <td>0.2146</td>
     </tr>
     <tr>
       <th>71</th>
       <td>8</td>
       <td>113</td>
-      <td>0.205136</td>
+      <td>0.2060</td>
     </tr>
   </tbody>
 </table>
@@ -7777,13 +7990,45 @@ display(elasticnet_regression_LOOCV_alpha)
 
 ```python
 ##################################
+# Renaming the alpha levels
+# based on the proper category labels
+##################################
+elasticnet_regression_LOOCV_alpha_conditions = [
+    (elasticnet_regression_LOOCV_alpha['alpha'] == 1),
+    (elasticnet_regression_LOOCV_alpha['alpha'] == 2),
+    (elasticnet_regression_LOOCV_alpha['alpha'] == 3),
+    (elasticnet_regression_LOOCV_alpha['alpha'] == 4),
+    (elasticnet_regression_LOOCV_alpha['alpha'] == 5),
+    (elasticnet_regression_LOOCV_alpha['alpha'] == 6),
+    (elasticnet_regression_LOOCV_alpha['alpha'] == 7),
+    (elasticnet_regression_LOOCV_alpha['alpha'] == 8)]
+
+elasticnet_regression_LOOCV_alpha_values = alphas_string_reversed
+elasticnet_regression_LOOCV_alpha['alpha'] = np.select(elasticnet_regression_LOOCV_alpha_conditions,
+                                                         elasticnet_regression_LOOCV_alpha_values,
+                                                         default=np.nan)
+elasticnet_regression_LOOCV_alpha['alpha'] = elasticnet_regression_LOOCV_alpha['alpha'].astype('category')
+```
+
+
+```python
+##################################
 # Plotting the elasticnet regression
 # hyperparameter tuning results
 # using LOOCV
 ##################################
 sns.set(style="whitegrid")
 plt.figure(figsize=(10, 6))
-sns.boxplot(x='alpha', y='MSE', data=elasticnet_regression_LOOCV_alpha, color="#0070C0")
+plt.grid(True)
+sns.boxplot(x='alpha', 
+            y='MSE', 
+            data=elasticnet_regression_LOOCV_alpha, 
+            color='#0070C0', 
+            showmeans=True,
+            meanprops={'marker':'o',
+                       'markerfacecolor':'#ADD8E6', 
+                       'markeredgecolor':'#FF0000',
+                       'markersize':'8'})
 plt.xlabel('Alpha Hyperparameter')
 plt.ylabel('Mean Squared Error')
 plt.title('Elastic Net Regression Hyperparameter Tuning Using LOOCV')
@@ -7792,7 +8037,7 @@ plt.show()
 
 
     
-![png](output_206_0.png)
+![png](output_211_0.png)
     
 
 
@@ -7846,21 +8091,21 @@ display(elasticnet_performance_train)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.629847</td>
+      <td>0.6298</td>
       <td>elasticnet_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.358232</td>
+      <td>0.3582</td>
       <td>elasticnet_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.460799</td>
+      <td>0.4608</td>
       <td>elasticnet_regression</td>
       <td>train</td>
     </tr>
@@ -7919,21 +8164,21 @@ display(elasticnet_performance_test)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.640929</td>
+      <td>0.6409</td>
       <td>elasticnet_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.375480</td>
+      <td>0.3755</td>
       <td>elasticnet_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.479981</td>
+      <td>0.4800</td>
       <td>elasticnet_regression</td>
       <td>test</td>
     </tr>
@@ -7950,6 +8195,7 @@ display(elasticnet_performance_test)
 ##################################
 figure = plt.figure(figsize=(10,6))
 axes = plt.axes()
+plt.grid(True)
 axes.plot(y_test, 
           elasticnet_y_hat_test, 
           marker='o', 
@@ -7965,11 +8211,32 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_209_0.png)
+![png](output_214_0.png)
     
 
 
 ## 1.7. Consolidated Findings <a class="anchor" id="1.7"></a>
+
+1. The [linear regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html) demonstrated the best independent test model performance among the candidate models. This model which did not apply any form of regularization proved to be more superior than the penalized models potentially due to the presence of a smaller subset of equally informative predictors - leading to a minimal over-confidence in the parameter estimates and in effect, minimal impact of the regularization constraints.
+    * **R-Squared** = 0.6446
+    * **Mean Squared Error** = 0.3716
+    * **Mean Absolute Error** = 0.4773
+3. Among the penalized models, the optimal [elastic net regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html) demonstrated the best independent test model performance with the tuned hyperparameter leaning towards a higher L1 regulairzation effect (optimal L1 ratio equals to 0.9 which is reminiscent of lasso where L1 ratio equals to 1.0).
+    * **R-Squared** = 0.6409
+    * **Mean Squared Error** = 0.3755
+    * **Mean Absolute Error** = 0.4800
+2. The optimal [lasso regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html) using an L1 regularization term demonstrated an equally high independent test model performance, confirming the earlier findings.
+    * **R-Squared** = 0.6405
+    * **Mean Squared Error** = 0.3760
+    * **Mean Absolute Error** = 0.4805
+3. The optimal [ridge regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html) using an L2 regularization term equally demonstrated good independent test model performance.
+    * **R-Squared** = 0.6352
+    * **Mean Squared Error** = 0.3815
+    * **Mean Absolute Error** = 0.4838
+4. The [polynomial regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html) demonstrated the worst independent test model performance. In addition, metrics obtained from the apparent and independent test model performance are relatively different, indicative of the presence of model overfitting.
+    * **R-Squared** = 0.6324
+    * **Mean Squared Error** = 0.3844
+    * **Mean Absolute Error** = 0.4867
 
 
 ```python
@@ -8024,210 +8291,210 @@ display(performance_comparison)
     <tr>
       <th>0</th>
       <td>R2</td>
-      <td>0.633225</td>
+      <td>0.6332</td>
       <td>linear_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>MSE</td>
-      <td>0.354963</td>
+      <td>0.3550</td>
       <td>linear_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>MAE</td>
-      <td>0.460899</td>
+      <td>0.4609</td>
       <td>linear_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>3</th>
       <td>R2</td>
-      <td>0.644619</td>
+      <td>0.6446</td>
       <td>linear_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>4</th>
       <td>MSE</td>
-      <td>0.371621</td>
+      <td>0.3716</td>
       <td>linear_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>5</th>
       <td>MAE</td>
-      <td>0.477317</td>
+      <td>0.4773</td>
       <td>linear_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>6</th>
       <td>R2</td>
-      <td>0.790822</td>
+      <td>0.7908</td>
       <td>polynomial_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>7</th>
       <td>MSE</td>
-      <td>0.202441</td>
+      <td>0.2024</td>
       <td>polynomial_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>8</th>
       <td>MAE</td>
-      <td>0.350251</td>
+      <td>0.3503</td>
       <td>polynomial_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>9</th>
       <td>R2</td>
-      <td>0.632381</td>
+      <td>0.6324</td>
       <td>polynomial_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>10</th>
       <td>MSE</td>
-      <td>0.384419</td>
+      <td>0.3844</td>
       <td>polynomial_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>11</th>
       <td>MAE</td>
-      <td>0.486662</td>
+      <td>0.4867</td>
       <td>polynomial_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>12</th>
       <td>R2</td>
-      <td>0.621954</td>
+      <td>0.6220</td>
       <td>ridge_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>13</th>
       <td>MSE</td>
-      <td>0.365871</td>
+      <td>0.3659</td>
       <td>ridge_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>14</th>
       <td>MAE</td>
-      <td>0.467997</td>
+      <td>0.4680</td>
       <td>ridge_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>15</th>
       <td>R2</td>
-      <td>0.635183</td>
+      <td>0.6352</td>
       <td>ridge_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>16</th>
       <td>MSE</td>
-      <td>0.381488</td>
+      <td>0.3815</td>
       <td>ridge_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>17</th>
       <td>MAE</td>
-      <td>0.483822</td>
+      <td>0.4838</td>
       <td>ridge_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>18</th>
       <td>R2</td>
-      <td>0.629495</td>
+      <td>0.6295</td>
       <td>lasso_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>19</th>
       <td>MSE</td>
-      <td>0.358573</td>
+      <td>0.3586</td>
       <td>lasso_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>20</th>
       <td>MAE</td>
-      <td>0.460833</td>
+      <td>0.4608</td>
       <td>lasso_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>21</th>
       <td>R2</td>
-      <td>0.640452</td>
+      <td>0.6405</td>
       <td>lasso_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>22</th>
       <td>MSE</td>
-      <td>0.375978</td>
+      <td>0.3760</td>
       <td>lasso_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>23</th>
       <td>MAE</td>
-      <td>0.480495</td>
+      <td>0.4805</td>
       <td>lasso_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>24</th>
       <td>R2</td>
-      <td>0.629847</td>
+      <td>0.6298</td>
       <td>elasticnet_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>25</th>
       <td>MSE</td>
-      <td>0.358232</td>
+      <td>0.3582</td>
       <td>elasticnet_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>26</th>
       <td>MAE</td>
-      <td>0.460799</td>
+      <td>0.4608</td>
       <td>elasticnet_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>27</th>
       <td>R2</td>
-      <td>0.640929</td>
+      <td>0.6409</td>
       <td>elasticnet_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>28</th>
       <td>MSE</td>
-      <td>0.375480</td>
+      <td>0.3755</td>
       <td>elasticnet_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>29</th>
       <td>MAE</td>
-      <td>0.479981</td>
+      <td>0.4800</td>
       <td>elasticnet_regression</td>
       <td>test</td>
     </tr>
@@ -8259,16 +8526,17 @@ performance_comparison_R2_plot = pd.DataFrame({'train': performance_comparison_R
                                               index=performance_comparison_R2['model'].unique())
 performance_comparison_R2_plot = performance_comparison_R2_plot.plot.barh(figsize=(10, 6))
 performance_comparison_R2_plot.set_xlim(0.00,1.00)
-performance_comparison_R2_plot.set_title("Model Comparison by R-Squared Performance")
+performance_comparison_R2_plot.set_title("Model Comparison by R-Squared Performance on Test Data")
 performance_comparison_R2_plot.set_xlabel("R-Squared Performance")
 performance_comparison_R2_plot.set_ylabel("Regression Model")
+performance_comparison_R2_plot.grid(False)
 for container in performance_comparison_R2_plot.containers:
     performance_comparison_R2_plot.bar_label(container)
 ```
 
 
     
-![png](output_213_0.png)
+![png](output_218_0.png)
     
 
 
@@ -8295,16 +8563,17 @@ performance_comparison_MSE_plot = pd.DataFrame({'train': performance_comparison_
                                                index=performance_comparison_MSE['model'].unique())
 performance_comparison_MSE_plot = performance_comparison_MSE_plot.plot.barh(figsize=(10, 6))
 performance_comparison_MSE_plot.set_xlim(0.00,1.00)
-performance_comparison_MSE_plot.set_title("Model Comparison by Mean Squared Error Performance")
+performance_comparison_MSE_plot.set_title("Model Comparison by Mean Squared Error Performance on Test Data")
 performance_comparison_MSE_plot.set_xlabel("Mean Squared Error Performance")
 performance_comparison_MSE_plot.set_ylabel("Regression Model")
+performance_comparison_MSE_plot.grid(False)
 for container in performance_comparison_MSE_plot.containers:
     performance_comparison_MSE_plot.bar_label(container)
 ```
 
 
     
-![png](output_215_0.png)
+![png](output_220_0.png)
     
 
 
@@ -8331,16 +8600,17 @@ performance_comparison_MAE_plot = pd.DataFrame({'train': performance_comparison_
                                                index=performance_comparison_MAE['model'].unique())
 performance_comparison_MAE_plot = performance_comparison_MAE_plot.plot.barh(figsize=(10, 6))
 performance_comparison_MAE_plot.set_xlim(0.00,1.00)
-performance_comparison_MAE_plot.set_title("Model Comparison by Mean Absolute Error Performance")
+performance_comparison_MAE_plot.set_title("Model Comparison by Mean Absolute Error Performance on Test Data")
 performance_comparison_MAE_plot.set_xlabel("Mean Absolute Error Performance")
 performance_comparison_MAE_plot.set_ylabel("Regression Model")
+performance_comparison_MAE_plot.grid(False)
 for container in performance_comparison_MAE_plot.containers:
     performance_comparison_MAE_plot.bar_label(container)
 ```
 
 
     
-![png](output_217_0.png)
+![png](output_222_0.png)
     
 
 
@@ -8403,7 +8673,9 @@ for container in performance_comparison_MAE_plot.containers:
 * **[Article]** [Hypothesis Testing with Python: Step by Step Hands-On Tutorial with Practical Examples](https://towardsdatascience.com/hypothesis-testing-with-python-step-by-step-hands-on-tutorial-with-practical-examples-e805975ea96e) by Ece Işık Polat (Towards Data Science)
 * **[Article]** [17 Statistical Hypothesis Tests in Python (Cheat Sheet)](https://machinelearningmastery.com/statistical-hypothesis-tests-in-python-cheat-sheet/) by Jason Brownlee (Machine Learning Mastery)
 * **[Article]** [A Step-by-Step Guide to Hypothesis Testing in Python using Scipy](https://medium.com/@gabriel_renno/a-step-by-step-guide-to-hypothesis-testing-in-python-using-scipy-8eb5b696ab07) by Gabriel Rennó (Medium)
-
+* **[Publication]** [Ridge Regression: Biased Estimation for Nonorthogonal Problems](https://www.tandfonline.com/doi/abs/10.1080/00401706.1970.10488634) by Arthur Hoerl and Robert Kennard (Technometrics)
+* **[Publication]** [Regression Shrinkage and Selection Via the Lasso](https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.2517-6161.1996.tb02080.x) by Rob Tibshirani (Journal of the Royal Statistical Society)
+* **[Publication]** [ Regularization and Variable Selection via the Elastic Net](https://rss.onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2005.00503.x) by Hui Zou and Trevor Hastie (Journal of the Royal Statistical Society)
 
 ***
 
