@@ -2,7 +2,7 @@
 # Supervised Learning : Exploring Penalized Models for Predicting Numeric Responses
 
 ***
-### John Pauline Pineda <br> <br> *November 17, 2023*
+### John Pauline Pineda <br> <br> *November 16, 2023*
 ***
 
 * [**1. Table of Contents**](#TOC)
@@ -133,14 +133,12 @@ from operator import add,mul,truediv
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PowerTransformer
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import PowerTransformer, StandardScaler
 from scipy import stats
 
-from sklearn.linear_model import Ridge,Lasso,ElasticNet
 from sklearn.linear_model import RidgeCV, LassoCV, ElasticNetCV
 from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error
-from sklearn.model_selection import train_test_split, KFold, GridSearchCV, RepeatedKFold, LeaveOneOut
+from sklearn.model_selection import train_test_split, LeaveOneOut
 from sklearn.preprocessing import PolynomialFeatures 
 from sklearn.pipeline import Pipeline
 ```
@@ -5475,6 +5473,22 @@ display(X_train.shape)
 
 ```python
 ##################################
+# Performing a general exploration of the train dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_test.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (49, 7)
+
+
+
+```python
+##################################
 # Defining a function to compute
 # model performance
 ##################################
@@ -5746,7 +5760,7 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_176_0.png)
+![png](output_177_0.png)
     
 
 
@@ -5962,7 +5976,7 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_181_0.png)
+![png](output_182_0.png)
     
 
 
@@ -6185,7 +6199,7 @@ plt.show()
 
 
     
-![png](output_186_0.png)
+![png](output_187_0.png)
     
 
 
@@ -6359,7 +6373,7 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_189_0.png)
+![png](output_190_0.png)
     
 
 
@@ -6761,7 +6775,7 @@ plt.show()
 
 
     
-![png](output_195_0.png)
+![png](output_196_0.png)
     
 
 
@@ -6935,7 +6949,7 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_198_0.png)
+![png](output_199_0.png)
     
 
 
@@ -7872,7 +7886,7 @@ plt.show()
 
 
     
-![png](output_208_0.png)
+![png](output_209_0.png)
     
 
 
@@ -8037,7 +8051,7 @@ plt.show()
 
 
     
-![png](output_211_0.png)
+![png](output_212_0.png)
     
 
 
@@ -8211,7 +8225,7 @@ axes.set(xlabel='Actual Cancer Rate',
 
 
     
-![png](output_214_0.png)
+![png](output_215_0.png)
     
 
 
@@ -8221,7 +8235,7 @@ axes.set(xlabel='Actual Cancer Rate',
     * **R-Squared** = 0.6446
     * **Mean Squared Error** = 0.3716
     * **Mean Absolute Error** = 0.4773
-3. Among the penalized models, the optimal [elastic net regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html) demonstrated the best independent test model performance with the tuned hyperparameter leaning towards a higher L1 regulairzation effect (optimal L1 ratio equals to 0.9 which is reminiscent of lasso where L1 ratio equals to 1.0).
+3. Among the penalized models, the optimal [elastic net regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html) demonstrated the best independent test model performance with the tuned hyperparameter leaning towards a higher L1 regularization effect (optimal L1 ratio equals 0.9 which is reminiscent of lasso where L1 ratio equals 1.0).
     * **R-Squared** = 0.6409
     * **Mean Squared Error** = 0.3755
     * **Mean Absolute Error** = 0.4800
@@ -8237,6 +8251,9 @@ axes.set(xlabel='Actual Cancer Rate',
     * **R-Squared** = 0.6324
     * **Mean Squared Error** = 0.3844
     * **Mean Absolute Error** = 0.4867
+5. The computed r-squared metrics for the formulated models were relatively low - only ranging from 0.63 to 0.65, which could be further improved by:
+    * Considering more informative predictors
+    * Considering more complex models other than linear regression and its variants
 
 
 ```python
@@ -8536,7 +8553,7 @@ for container in performance_comparison_R2_plot.containers:
 
 
     
-![png](output_218_0.png)
+![png](output_219_0.png)
     
 
 
@@ -8573,7 +8590,7 @@ for container in performance_comparison_MSE_plot.containers:
 
 
     
-![png](output_220_0.png)
+![png](output_221_0.png)
     
 
 
@@ -8610,12 +8627,34 @@ for container in performance_comparison_MAE_plot.containers:
 
 
     
-![png](output_222_0.png)
+![png](output_223_0.png)
     
 
 
 # 2. Summary <a class="anchor" id="Summary"></a>
 
+A detailed [report](https://github.com/JohnPaulinePineda/Supervised-Machine-Learning-Regression-Final-Assignment/blob/main/SupervisedMachineLearningRegressionCapstone_JohnPaulinePineda.pdf) was formulated documenting all the analysis steps and findings.
+
+
+![RegressionProject_Introduction.png](attachment:9746c82a-f414-411a-ab1c-162e7d0a1362.png)
+
+![RegressionProject_Methodology.png](attachment:81f792e5-7b18-412c-b004-761b15548067.png)
+
+![RegressionProject__DataGathering.png](attachment:824d0efa-1813-4aff-ad46-6aa1d51f9db2.png)
+
+![RegressionProject_DataDescription.png](attachment:b3be7595-0010-47ad-b111-71cf4331a385.png)
+
+![RegressionProject__DataQualityAssessment.png](attachment:1fb1d7ee-2823-48c6-bf53-aff6a3b16548.png)
+
+![RegressionProject__DataPreprocessing.png](attachment:8f19622f-29af-4558-93b6-c3c60d102a5f.png)
+
+![RegressionProject__DataExploration.png](attachment:199ead90-0df0-4fa5-871c-886948cc9888.png)
+
+![RegressionProject_ModelDevelopment.png](attachment:ed349522-7a40-492d-a6ad-bf96b9f17afd.png)
+
+![RegressionProject_OverallFindingsAndImplications.png](attachment:8ed56c70-31ee-46dd-9887-bcc798197844.png)
+
+![RegressionProject_OverallConclusion.png](attachment:418b2854-2232-4f9b-b2ba-ec68bb4e4666.png)
 
 # 3. References <a class="anchor" id="References"></a>
 * **[Book]** [Data Preparation for Machine Learning: Data Cleaning, Feature Selection, and Data Transforms in Python](https://machinelearningmastery.com/data-preparation-for-machine-learning/) by Jason Brownlee
@@ -8635,6 +8674,9 @@ for container in performance_comparison_MAE_plot.containers:
 * **[Python Library API]** [sklearn.impute](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.impute) by Scikit-Learn Team
 * **[Python Library API]** [sklearn.linear_model](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.linear_model) by Scikit-Learn Team
 * **[Python Library API]** [sklearn.preprocessing](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing) by Scikit-Learn Team
+* **[Python Library API]** [sklearn.metrics](https://scikit-learn.org/stable/modules/model_evaluation.html) by Scikit-Learn Team
+* **[Python Library API]** [sklearn.model_selection](https://scikit-learn.org/stable/model_selection.html) by Scikit-Learn Team
+* **[Python Library API]** [sklearn.pipeline](https://scikit-learn.org/stable/modules/compose.html) by Scikit-Learn Team
 * **[Python Library API]** [scipy](https://docs.scipy.org/doc/scipy/) by SciPy Team
 * **[Article]** [Step-by-Step Exploratory Data Analysis (EDA) using Python](https://www.analyticsvidhya.com/blog/2022/07/step-by-step-exploratory-data-analysis-eda-using-python/#:~:text=Exploratory%20Data%20Analysis%20(EDA)%20with,distributions%20using%20Python%20programming%20language.) by Malamahadevan Mahadevan (Analytics Vidhya)
 * **[Article]** [Exploratory Data Analysis in Python — A Step-by-Step Process](https://towardsdatascience.com/exploratory-data-analysis-in-python-a-step-by-step-process-d0dfa6bf94ee) by Andrea D'Agostino (Towards Data Science)
